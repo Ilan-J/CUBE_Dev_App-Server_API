@@ -1,4 +1,5 @@
-﻿using CUBE_Dev_App_Server_API.DBQueries;
+﻿using CUBE_Dev_App_Server_API.Models;
+using CUBE_Dev_App_Server_API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CUBE_Dev_App_Server_API.Controllers;
@@ -7,26 +8,59 @@ namespace CUBE_Dev_App_Server_API.Controllers;
 [Route("[controller]")]
 public class SupplierController : ControllerBase
 {
-    private readonly ILogger<SupplierController> _logger;
-
-    public SupplierController(ILogger<SupplierController> logger)
+    public SupplierController()
     {
-        _logger = logger;
     }
 
-    [HttpGet(Name = "GetSupplier")]
-    public IEnumerable<Supplier> Get()
+    [HttpGet]
+    public ActionResult<List<Supplier>> GetAll() =>
+        SupplierService.GetAll();
+    
+    [HttpGet("{id}")]
+    public ActionResult<Supplier> Get(int id)
     {
-        Supplier[]? suppliers = QSuppliers.SelectAll();
-        if (suppliers is null)
-        {
-            return Enumerable.Empty<Supplier>();
-        }
-        return suppliers;
-    }
-    [HttpPut(Name = "PutSupplier")]
-    public void Put(Supplier supplier)
-    {
+        var supplier = SupplierService.Get(id);
 
+        if (supplier is null)
+            return NotFound();
+
+        return supplier;
+    }
+
+    [HttpPost]
+    public IActionResult Create(Supplier supplier)
+    {
+        SupplierService.Add(supplier);
+
+        return NoContent();
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, Supplier supplier)
+    {
+        if (id != supplier.Id)
+            return BadRequest();
+        
+        var existingSupplier = SupplierService.Get(id);
+
+        if (existingSupplier is null)
+            return NotFound();
+        
+        SupplierService.Update(supplier);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        var supplier = SupplierService.Get(id);
+        
+        if (supplier is null)
+            return NotFound();
+
+        SupplierService.Delete(id);
+
+        return NoContent();
     }
 }
