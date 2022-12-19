@@ -38,7 +38,7 @@ public class SupplierController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult Update(int id, Supplier supplier)
     {
-        if (id != supplier.Id)
+        if (id != supplier.PkSupplier)
             return BadRequest();
         
         var existingSupplier = SupplierService.Get(id);

@@ -7,113 +7,104 @@ public static class SupplierService
 {
     public static List<Supplier> GetAll()
     {
-        if (!DBConnection.GetConnection(out MySqlConnection connection))
-        {
-            throw new Exception("Cannot connect to server");
-        }
         string sql = "SELECT * FROM `supplier`";
 
-        MySqlDataReader reader = new MySqlCommand(sql, connection).ExecuteReader();
+        DBConnection.Connection.Open();
+        MySqlDataReader reader = new MySqlCommand(sql, DBConnection.Connection).ExecuteReader();
 
         List<Supplier> suppliers = new();
         while (reader.Read())
         {
             suppliers.Add(new Supplier
             {
-                Id =            reader.GetInt32("id"),
+                PkSupplier =    reader.GetInt32("pk_supplier"),
+
                 Name =          reader.GetString("name"),
                 Email =         reader.GetString("email"),
+
                 Address =       reader.GetString("address"),
                 City =          reader.GetString("city"),
-                PostalCode =    reader.GetString("postalcode")
+                PostalCode =    reader.GetString("postal_code")
             });
         }
-        reader.Close();
-        connection.Close();
+        DBConnection.Connection.Close();
 
         return suppliers;
     }
 
     public static Supplier? Get(int id)
     {
-        if (!DBConnection.GetConnection(out MySqlConnection connection))
-        {
-            throw new Exception("Cannot connect to server");
-        }
-        string sql = $"SELECT * FROM `supplier` WHERE `id` = {id}";
+        string sql = $"SELECT * FROM `supplier` " +
+            $"WHERE `pk_supplier` = {id}";
 
-        MySqlDataReader reader = new MySqlCommand(sql, connection).ExecuteReader();
+        DBConnection.Connection.Open();
+        MySqlDataReader reader = new MySqlCommand(sql, DBConnection.Connection).ExecuteReader();
+
         if (!reader.Read())
-        {
             return null;
-        }
+
         Supplier supplier = new()
         {
-            Id =            reader.GetInt32("id"),
+            PkSupplier =    reader.GetInt32("pk_supplier"),
+
             Name =          reader.GetString("name"),
             Email =         reader.GetString("email"),
+
             Address =       reader.GetString("address"),
             City =          reader.GetString("city"),
-            PostalCode =    reader.GetString("postalcode")
+            PostalCode =    reader.GetString("postal_code")
         };
-        reader.Close();
-        connection.Close();
+        DBConnection.Connection.Close();
 
         return supplier;
     }
 
     public static void Add(Supplier supplier)
     {
-        if (!DBConnection.GetConnection(out MySqlConnection connection))
-        {
-            throw new Exception("Cannot connect to server");
-        }
-        string sql = "INSERT INTO `supplier` (`name`, `email`, `address`, `city`, `postalcode`) " +
-            "VALUES (@name, @email, @address, @city, @postalcode)";
+        string sql = "INSERT INTO `supplier` (`name`, `email`, `address`, `city`, `postal_code`) " +
+            "VALUES (@name, @email, @address, @city, @postal_code)";
         
-        MySqlCommand command = new(sql, connection);
+        MySqlCommand command = new(sql, DBConnection.Connection);
 
-        command.Parameters.AddWithValue("@name", supplier.Name);
-        command.Parameters.AddWithValue("@email", supplier.Email);
-        command.Parameters.AddWithValue("@address", supplier.Address);
-        command.Parameters.AddWithValue("@city", supplier.City);
-        command.Parameters.AddWithValue("@postalcode", supplier.PostalCode);
+        command.Parameters.AddWithValue("@name",        supplier.Name);
+        command.Parameters.AddWithValue("@email",       supplier.Email);
 
+        command.Parameters.AddWithValue("@address",     supplier.Address);
+        command.Parameters.AddWithValue("@city",        supplier.City);
+        command.Parameters.AddWithValue("@postal_code", supplier.PostalCode);
+
+        DBConnection.Connection.Open();
         command.ExecuteNonQuery();
-        connection.Close();
+        DBConnection.Connection.Close();
     }
 
     public static void Delete(int id)
     {
-        if (!DBConnection.GetConnection(out MySqlConnection connection))
-        {
-            throw new Exception("Cannot connect to server");
-        }
-        string sql = $"DELETE FROM `supplier` WHERE `id` = {id}";
+        string sql = $"DELETE FROM `supplier` " +
+            $"WHERE `pk_supplier` = {id}";
 
-        new MySqlCommand(sql, connection).ExecuteNonQuery();
-        connection.Close();
+        DBConnection.Connection.Open();
+        new MySqlCommand(sql, DBConnection.Connection).ExecuteNonQuery();
+        DBConnection.Connection.Close();
     }
 
     public static void Update(Supplier supplier)
     {
-        if (!DBConnection.GetConnection(out MySqlConnection connection))
-        {
-            throw new Exception("Cannot connect to server");
-        }
         string sql = $"UPDATE `supplier` " +
-            $"SET `name` = @name, `email` = @email, `address` = @address, `city` = @city, `postalcode` = @postalcode " +
-            $"WHERE `id` = {supplier.Id}";
+            $"SET `name` = @name, `email` = @email, `address` = @address, `city` = @city, `postal_code` = @postal_code " +
+            $"WHERE `pk_supplier` = {supplier.PkSupplier}";
+        
+        MySqlCommand command = new(sql, DBConnection.Connection);
 
-        MySqlCommand command = new(sql, connection);
+        command.Parameters.AddWithValue("@name",        supplier.Name);
+        command.Parameters.AddWithValue("@email",       supplier.Email);
 
-        command.Parameters.AddWithValue("@name", supplier.Name);
-        command.Parameters.AddWithValue("@email", supplier.Email);
-        command.Parameters.AddWithValue("@address", supplier.Address);
-        command.Parameters.AddWithValue("@city", supplier.City);
-        command.Parameters.AddWithValue("@postalcode", supplier.PostalCode);
+        command.Parameters.AddWithValue("@address",     supplier.Address);
+        command.Parameters.AddWithValue("@city",        supplier.City);
+        command.Parameters.AddWithValue("@postal_code", supplier.PostalCode);
 
+        DBConnection.Connection.Open();
         command.ExecuteNonQuery();
-        connection.Close();
+        DBConnection.Connection.Close();
     }
 }

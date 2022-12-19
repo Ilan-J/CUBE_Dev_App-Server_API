@@ -1,16 +1,20 @@
-﻿namespace CUBE_Dev_App_Server_API;
+﻿using System.Text.Json;
+
+namespace CUBE_Dev_App_Server_API;
 
 public static class Settings
 {
-    public static string GetDBSettings()
+    public static DBSettings? GetDBSettings()
     {
-        string host = "localhost";
-        int port = 3306;
+        string path = "dbsettings.json";
 
-        string database = "db_negosud";
-        string uid = "root";
-        string pwd = "1234";
+        if (!File.Exists(path))
+            File.WriteAllText(path, JsonSerializer.Serialize(new DBSettings()));
 
-        return $"server={host}; port={port}; database={database}; uid={uid}; pwd={pwd}";
+        StreamReader file = new(path);
+        string json = file.ReadToEnd();
+        file.Close();
+        
+        return JsonSerializer.Deserialize<DBSettings>(json);
     }
 }
