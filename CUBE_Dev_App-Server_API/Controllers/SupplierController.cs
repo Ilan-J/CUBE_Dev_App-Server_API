@@ -13,26 +13,33 @@ public class SupplierController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Supplier>> GetAll() =>
-        SupplierService.GetAll();
-    
-    [HttpGet("{id}")]
-    public ActionResult<Supplier> Get(int id)
+    public IActionResult GetAll()
     {
-        var supplier = SupplierService.Get(id);
+        if (!SupplierService.GetAll(out List<Supplier> suppliers))
+            return StatusCode(500);
+
+        return Ok(suppliers);
+    }
+
+    [HttpGet("{id}")]
+    public IActionResult Get(int id)
+    {
+        if (!SupplierService.Get(id, out Supplier? supplier))
+            return StatusCode(500);
 
         if (supplier is null)
             return NotFound();
 
-        return supplier;
+        return Ok(supplier);
     }
 
     [HttpPost]
     public IActionResult Create(Supplier supplier)
     {
-        SupplierService.Add(supplier);
+        if (!SupplierService.Add(supplier))
+            return StatusCode(500);
 
-        return NoContent();
+        return CreatedAtAction(nameof(Create), new { pkSupplier = supplier.PkSupplier }, supplier);
     }
 
     [HttpPut("{id}")]
@@ -41,12 +48,14 @@ public class SupplierController : ControllerBase
         if (id != supplier.PkSupplier)
             return BadRequest();
         
-        var existingSupplier = SupplierService.Get(id);
+        if (!SupplierService.Get(id, out Supplier? existingSupplier))
+            return StatusCode(500);
 
         if (existingSupplier is null)
             return NotFound();
         
-        SupplierService.Update(supplier);
+        if (!SupplierService.Update(supplier))
+            return StatusCode(500);
 
         return NoContent();
     }
@@ -54,12 +63,14 @@ public class SupplierController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var supplier = SupplierService.Get(id);
+        if (!SupplierService.Get(id, out Supplier? supplier))
+            return StatusCode(500);
         
         if (supplier is null)
             return NotFound();
 
-        SupplierService.Delete(id);
+        if (!SupplierService.Delete(id))
+            return StatusCode(500);
 
         return NoContent();
     }

@@ -1,6 +1,7 @@
 ﻿using CUBE_Dev_App_Server_API.Models;
 using CUBE_Dev_App_Server_API.Services;
 using Microsoft.AspNetCore.Mvc;
+using MySqlX.XDevAPI;
 
 namespace CUBE_Dev_App_Server_API.Controllers;
 
@@ -13,40 +14,64 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Product>> GetAll() =>
-        ProductService.GetAll();
+    public IActionResult GetAll()
+    {
+        if (!ProductService.GetAll(out List<Product> products))
+            return StatusCode(500);
+
+        WineFamilyService.GetAll(out List<WineFamily> wineFamilies);
+        SupplierService.GetAll(out List<Supplier> suppliers);
+
+        products.ForEach(product =>
+        {
+            product.WineFamily  = wineFamilies[product.FkWineFamily - 1];
+            product.Supplier    = suppliers[product.FkSupplier - 1];
+        });
+
+        return Ok(products);
+    }
 
     [HttpGet("{id}")]
-    public ActionResult<Product> Get(int id)
+    public IActionResult Get(int id)
     {
-        var product = ProductService.Get(id);
+        if (!ProductService.Get(id, out Product? product))
+            return StatusCode(500);
 
         if (product is null)
             return NotFound();
 
-        return product;
+        WineFamilyService.Get(product.FkWineFamily, out WineFamily? wineFamily);
+        product.WineFamily = wineFamily;
+
+        SupplierService.Get(product.FkSupplier, out Supplier? supplier);
+        product.Supplier = supplier;
+
+        return Ok(product);
     }
 
     [HttpPost]
-    public IActionResult Post(Product product)
+    public IActionResult Create(Product product)
     {
-        ProductService.Add(product);
+        if (!ProductService.Add(product))
+            return StatusCode(500);
 
-        return NoContent();
+        return CreatedAtAction(nameof(Create), new { pkProduct = product.PkProduct }, product);
     }
 
     [HttpPut("{id}")]
-    public IActionResult Put(int id, Product product)
+    public IActionResult Update(int id, Product product)
     {
         if (id != product.PkProduct)
             return BadRequest();
 
-        var existingProduct = ProductService.Get(id);
+        if (!ProductService.Get(id, out Product? existingProduct))
+            return StatusCode(500);
 
         if (existingProduct is null)
             return NotFound();
 
-        ProductService.Update(product);
+        if (!ProductService.Update(product))
+            return StatusCode(500);
 
         return NoContent();
     }
@@ -54,12 +79,14 @@ public class ProductController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var product = ProductService.Get(id);
+        if (!ProductService.Get(id, out Product? product))
+            return StatusCode(500);
 
         if (product is null)
             return NotFound();
 
-        ProductService.Delete(id);
+        if (!ProductService.Delete(id))
+            return StatusCode(500);
 
         return NoContent();
     }

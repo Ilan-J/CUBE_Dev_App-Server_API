@@ -13,26 +13,33 @@ public class ClientController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Client>> GetAll() =>
-        ClientService.GetAll();
+    public IActionResult GetAll()
+    {
+        if (!ClientService.GetAll(out List<Client> clients))
+            return StatusCode(500);
+
+        return Ok(clients);
+    }
 
     [HttpGet("{id}")]
-    public ActionResult<Client> Get(int id)
+    public IActionResult Get(int id)
     {
-        var client = ClientService.Get(id);
+        if(!ClientService.Get(id, out Client? client))
+            return StatusCode(500);
 
         if (client is null)
             return NotFound();
 
-        return client;
+        return Ok(client);
     }
 
     [HttpPost]
     public IActionResult Create(Client client)
     {
-        ClientService.Add(client);
+        if (!ClientService.Add(client))
+            return StatusCode(500);
 
-        return NoContent();
+        return CreatedAtAction(nameof(Create), new { pkClient = client.PkClient }, client);
     }
 
     [HttpPut("{id}")]
@@ -41,12 +48,14 @@ public class ClientController : ControllerBase
         if (id != client.PkClient)
             return BadRequest();
 
-        var existingClient = ClientService.Get(id);
+        if (!ClientService.Get(id, out Client? existingClient))
+            return StatusCode(500);
 
         if (existingClient is null)
             return NotFound();
 
-        ClientService.Update(client);
+        if (!ClientService.Update(client))
+            return StatusCode(500);
 
         return NoContent();
     }
@@ -54,12 +63,14 @@ public class ClientController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var client = ClientService.Get(id);
+        if (!ClientService.Get(id, out Client? client))
+            return StatusCode(500);
 
         if (client is null)
             return NotFound();
 
-        ClientService.Delete(id);
+        if (!ClientService.Delete(id))
+            return StatusCode(500);
 
         return NoContent();
     }

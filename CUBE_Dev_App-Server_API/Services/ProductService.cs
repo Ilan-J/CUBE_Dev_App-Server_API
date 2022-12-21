@@ -5,14 +5,16 @@ namespace CUBE_Dev_App_Server_API.Services;
 
 public static class ProductService
 {
-    public static List<Product> GetAll()
+    public static bool GetAll(out List<Product> products)
     {
         string sql = "SELECT * FROM `product`";
 
-        DBConnection.Connection.Open();
-        MySqlDataReader reader = new MySqlCommand(sql, DBConnection.Connection).ExecuteReader();
+        products = new List<Product>();
 
-        List<Product> products = new();
+        MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
+        if (reader is null)
+            return false;
+
         while (reader.Read())
         {
             products.Add(new Product()
@@ -35,23 +37,29 @@ public static class ProductService
                 FkSupplier =    reader.GetInt32("fk_supplier")
             });
         }
-        DBConnection.Connection.Close();
-
-        return products;
+        reader.Close();
+        return true;
     }
 
-    public static Product? Get(int id)
+    public static bool Get(int id, out Product? product)
     {
         string sql = $"SELECT * FROM `product` " +
             $"WHERE `pk_product` = {id}";
 
-        DBConnection.Connection.Open();
-        MySqlDataReader reader = new MySqlCommand(sql, DBConnection.Connection).ExecuteReader();
+        MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
+        if (reader is null)
+        {
+            product = null;
+            return false;
+        }
 
         if (!reader.Read())
-            return null;
+        {
+            product = null;
+            return true;
+        }
         
-        Product product = new()
+        product = new Product()
         {
             PkProduct =     reader.GetInt32("pk_product"),
 
@@ -70,17 +78,16 @@ public static class ProductService
             FkWineFamily =  reader.GetInt32("fk_wine_family"),
             FkSupplier =    reader.GetInt32("fk_supplier")
         };
-        DBConnection.Connection.Close();
-
-        return product;
+        reader.Close();
+        return true;
     }
 
-    public static void Add(Product product)
+    public static bool Add(Product product)
     {
         string sql = "INSERT INTO `product` (name, reference, price, tva, age, description, stock, stock_min, fk_wine_family, fk_supplier) " +
             "VALUES (@name, @reference, @price, @tva, @age, @description, @stock, @stock_min, @fk_wine_family, @fk_supplier)";
 
-        MySqlCommand command = new(sql, DBConnection.Connection);
+        MySqlCommand command = new(sql);
 
         command.Parameters.AddWithValue("@name",            product.Name);
         command.Parameters.AddWithValue("@reference",       product.Reference);
@@ -97,22 +104,19 @@ public static class ProductService
         command.Parameters.AddWithValue("@fk_wine_family",  product.FkWineFamily);
         command.Parameters.AddWithValue("@fk_supplier",     product.FkSupplier);
 
-        DBConnection.Connection.Open();
-        command.ExecuteNonQuery();
-        DBConnection.Connection.Close();
+        if (!DBConnection.Execute(command))
+            return false;
+
+        product.PkProduct = DBConnection.GetLastPk("product");
+        return true;
     }
 
-    public static void Delete(int id)
+    public static bool Delete(int id)
     {
-        string sql = $"DELETE FROM `product` " +
-            $"WHERE `pk_product` = {id}";
-
-        DBConnection.Connection.Open();
-        new MySqlCommand(sql, DBConnection.Connection).ExecuteNonQuery();
-        DBConnection.Connection.Close();
+        return DBConnection.Delete("product", id);
     }
 
-    public static void Update(Product product)
+    public static bool Update(Product product)
     {
         string sql = $"UPDATE `product`                 " +
             $"SET                                       " +
@@ -126,9 +130,9 @@ public static class ProductService
             $"`stock_min` =         @stock_min,         " +
             $"`fk_wine_family` =    @fk_wine_family,    " +
             $"`fk_supplier` =       @fk_supplier        " +
-            $"WHERE `pk_product` =  {product.PkProduct}`";
+            $"WHERE `pk_product` =  {product.PkProduct}";
 
-        MySqlCommand command = new(sql, DBConnection.Connection);
+        MySqlCommand command = new(sql);
 
         command.Parameters.AddWithValue("@name",            product.Name);
         command.Parameters.AddWithValue("@reference",       product.Reference);
@@ -145,8 +149,9 @@ public static class ProductService
         command.Parameters.AddWithValue("@fk_wine_family",  product.FkWineFamily);
         command.Parameters.AddWithValue("@fk_supplier",     product.FkSupplier);
 
-        DBConnection.Connection.Open();
-        command.ExecuteNonQuery();
-        DBConnection.Connection.Close();
+        if (!DBConnection.Execute(command))
+            return false;
+
+        return true;
     }
 }

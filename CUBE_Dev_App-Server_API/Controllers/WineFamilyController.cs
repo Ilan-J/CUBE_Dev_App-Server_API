@@ -13,26 +13,33 @@ public class WineFamilyController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<WineFamily>> GetAll() =>
-        WineFamilyService.GetAll();
+    public IActionResult GetAll()
+    {
+        if (!WineFamilyService.GetAll(out List<WineFamily> wineFamilies))
+            return StatusCode(500);
+
+        return Ok(wineFamilies);
+    }
 
     [HttpGet("{id}")]
-    public ActionResult<WineFamily> Get(int id)
+    public IActionResult Get(int id)
     {
-        var wineFamily = WineFamilyService.Get(id);
+        if (!WineFamilyService.Get(id, out WineFamily? wineFamily))
+            return StatusCode(500);
 
         if (wineFamily is null)
             return NotFound();
 
-        return wineFamily;
+        return Ok(wineFamily);
     }
 
     [HttpPost]
     public IActionResult Create(WineFamily wineFamily)
     {
-        WineFamilyService.Add(wineFamily);
+        if (!WineFamilyService.Add(wineFamily))
+            return StatusCode(500);
 
-        return NoContent();
+        return CreatedAtAction(nameof(Create), new { pkWineFamily = wineFamily.PkWineFamily }, wineFamily);
     }
 
     [HttpPut("{id}")]
@@ -41,12 +48,14 @@ public class WineFamilyController : ControllerBase
         if (id != wineFamily.PkWineFamily)
             return BadRequest();
 
-        var existingWineFamily = WineFamilyService.Get(id);
+        if (!WineFamilyService.Get(id, out WineFamily? existingWineFamily))
+            return StatusCode(500);
 
         if (existingWineFamily is null)
             return NotFound();
 
-        WineFamilyService.Update(wineFamily);
+        if (!WineFamilyService.Update(wineFamily))
+            return StatusCode(500);
 
         return NoContent();
     }
@@ -54,12 +63,14 @@ public class WineFamilyController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var wineFamily = WineFamilyService.Get(id);
+        if (!WineFamilyService.Get(id, out WineFamily? wineFamily))
+            return StatusCode(500);
 
         if (wineFamily is null)
             return NotFound();
 
-        WineFamilyService.Delete(id);
+        if (!WineFamilyService.Delete(id))
+            return StatusCode(500);
 
         return NoContent();
     }

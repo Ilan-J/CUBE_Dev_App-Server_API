@@ -5,84 +5,89 @@ namespace CUBE_Dev_App_Server_API.Services;
 
 public static class WineFamilyService
 {
-    public static List<WineFamily> GetAll()
+    public static bool GetAll(out List<WineFamily> wineFamilies)
     {
         string sql = "SELECT * FROM `wine_family`";
 
-        DBConnection.Connection.Open();
-        MySqlDataReader reader = new MySqlCommand(sql, DBConnection.Connection).ExecuteReader();
+        wineFamilies = new List<WineFamily>();
 
-        List<WineFamily> wineFamilies = new();
+        MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
+        if (reader is null)
+            return false;
+
         while (reader.Read())
         {
             wineFamilies.Add(new WineFamily()
             {
-                PkWineFamily =  reader.GetInt32("pk_wine_family"),
-                Name =          reader.GetString("name")
+                PkWineFamily    = reader.GetInt32("pk_wine_family"),
+                Name            = reader.GetString("name")
             });
         }
-        DBConnection.Connection.Close();
-
-        return wineFamilies;
+        reader.Close();
+        return true;
     }
 
-    public static WineFamily? Get(int id)
+    public static bool Get(int id, out WineFamily? wineFamily)
     {
         string sql = $"SELECT * FROM `wine_family` " +
             $"WHERE `pk_wine_family` = {id}";
-
-        DBConnection.Connection.Open();
-        MySqlDataReader reader = new MySqlCommand(sql, DBConnection.Connection).ExecuteReader();
+        
+        MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
+        if (reader is null)
+        {
+            wineFamily = null;
+            return false;
+        }
 
         if (!reader.Read())
-            return null;
-
-        WineFamily wineFamily = new()
         {
-            PkWineFamily =  reader.GetInt32("pk_wine_family"),
-            Name =          reader.GetString("name")
-        };
-        DBConnection.Connection.Close();
+            wineFamily = null;
+            return true;
+        }
 
-        return wineFamily;
+        wineFamily = new WineFamily()
+        {
+            PkWineFamily    = reader.GetInt32("pk_wine_family"),
+            Name            = reader.GetString("name")
+        };
+        reader.Close();
+        return true;
     }
 
-    public static void Add(WineFamily wineFamily)
+    public static bool Add(WineFamily wineFamily)
     {
         string sql = "INSERT INTO `wine_family` (`name`) " +
             "VALUES (@name)";
 
-        MySqlCommand command = new(sql, DBConnection.Connection);
+        MySqlCommand command = new(sql);
 
         command.Parameters.AddWithValue("@name", wineFamily.Name);
 
-        DBConnection.Connection.Open();
-        command.ExecuteNonQuery();
-        DBConnection.Connection.Close();
+        if (!DBConnection.Execute(command))
+            return false;
+
+        wineFamily.PkWineFamily = DBConnection.GetLastPk("wine_family");
+        return true;
     }
 
-    public static void Delete(int id)
+    public static bool Delete(int id)
     {
-        string sql = $"DELETE FROM `wine_family` " +
-            $"WHERE `pk_wine_family` = {id}";
-
-        DBConnection.Connection.Open();
-        new MySqlCommand(sql, DBConnection.Connection).ExecuteNonQuery();
-        DBConnection.Connection.Close();
+        return DBConnection.Delete("wine_family", id);
     }
 
-    public static void Update(WineFamily wineFamily)
+    public static bool Update(WineFamily wineFamily)
     {
         string sql = $"UPDATE `wine_family` " +
             $"SET `name` = @name " +
-            $"WHERE `pk_wine_family` = {wineFamily.PkWineFamily}`";
+            $"WHERE `pk_wine_family` = {wineFamily.PkWineFamily}";
 
-        MySqlCommand command = new(sql, DBConnection.Connection);
+        MySqlCommand command = new(sql);
 
         command.Parameters.AddWithValue("@name", wineFamily.Name);
 
-        DBConnection.Connection.Open();
-        command.ExecuteNonQuery();
-        DBConnection.Connection.Close();
+        if (!DBConnection.Execute(command))
+            return false;
+
+        return true;
     }
 }

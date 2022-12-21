@@ -4,7 +4,7 @@ namespace CUBE_Dev_App_Server_API;
 
 public static class Settings
 {
-    public static DBSettings? GetDBSettings()
+    public static DBSettings GetDBSettings()
     {
         string path = "dbsettings.json";
 
@@ -14,7 +14,14 @@ public static class Settings
         StreamReader file = new(path);
         string json = file.ReadToEnd();
         file.Close();
-        
-        return JsonSerializer.Deserialize<DBSettings>(json);
+
+        DBSettings? dbSettings = JsonSerializer.Deserialize<DBSettings>(json);
+        if (dbSettings is null)
+        {
+            dbSettings = new DBSettings();
+            Console.WriteLine("Error DBSettings deserialization");
+        }
+
+        return dbSettings;
     }
 }
