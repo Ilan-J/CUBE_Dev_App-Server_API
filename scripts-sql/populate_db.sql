@@ -68,6 +68,25 @@ VALUES
         3
     );
 
+INSERT INTO `SupplierCommand` (
+	`totalCost`,
+    `transportCost`,
+    `fkSupplier`
+    )
+VALUES
+	(1849.3,	5.25,	1),
+    (420,		8.3,	2);
+
+INSERT INTO `SupplyList` (
+	`fkProduct`,
+    `fkSupplierCommand`,
+    `quantity`
+    )
+VALUES
+	(1, 1, 50),
+    (2, 1, 20),
+    (3, 2, 30);
+
 INSERT INTO `Client` (
     `email`,
     `password`,

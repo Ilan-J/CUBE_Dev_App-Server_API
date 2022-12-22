@@ -21,11 +21,11 @@ public static class SupplyListService
             {
                 SupplierCommand = new SupplierCommand()
                 {
-                    PkSupplierCommand = reader.GetInt32("pkSupplierCommand")
+                    PkSupplierCommand = reader.GetInt32("fkSupplierCommand")
                 },
                 Product = new Product()
                 {
-                    PkProduct = reader.GetInt32("pkProduct")
+                    PkProduct = reader.GetInt32("fkProduct")
                 },
                 Quantity = reader.GetInt32("quantity")
             });
@@ -50,11 +50,11 @@ public static class SupplyListService
             {
                 SupplierCommand = new SupplierCommand()
                 {
-                    PkSupplierCommand = reader.GetInt32("pkSupplierCommand")
+                    PkSupplierCommand = reader.GetInt32("fkSupplierCommand")
                 },
                 Product = new Product()
                 {
-                    PkProduct = reader.GetInt32("pkProduct")
+                    PkProduct = reader.GetInt32("fkProduct")
                 },
                 Quantity = reader.GetInt32("quantity")
             });
@@ -78,11 +78,11 @@ public static class SupplyListService
             {
                 SupplierCommand = new SupplierCommand()
                 {
-                    PkSupplierCommand = reader.GetInt32("pkSupplierCommand")
+                    PkSupplierCommand = reader.GetInt32("fkSupplierCommand")
                 },
                 Product = new Product()
                 {
-                    PkProduct = reader.GetInt32("pkProduct")
+                    PkProduct = reader.GetInt32("fkProduct")
                 },
                 Quantity = reader.GetInt32("quantity")
             });

@@ -67,8 +67,8 @@ CREATE TABLE IF NOT EXISTS `Product` (
     UNIQUE(`reference`),
     KEY `fkSupplier` 	(`fkSupplier`),
     KEY `fkWineFamily` 	(`fkWineFamily`),
-    CONSTRAINT `product_ibfk_1` FOREIGN KEY(`fkSupplier`) 	REFERENCES `supplier` 	(`pkSupplier`),
-    CONSTRAINT `product_ibfk_2` FOREIGN KEY(`fkWineFamily`) REFERENCES `wineFamily` (`pkWineFamily`)
+    CONSTRAINT `product_ibfk_1` FOREIGN KEY(`fkSupplier`) 	REFERENCES `Supplier` 	(`pkSupplier`),
+    CONSTRAINT `product_ibfk_2` FOREIGN KEY(`fkWineFamily`) REFERENCES `WineFamily` (`pkWineFamily`)
 );
 
 CREATE TABLE IF NOT EXISTS `SupplierCommand` (
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `SupplierCommand` (
 
     PRIMARY KEY(`pkSupplierCommand`),
     KEY `fkSupplier` (`fkSupplier`),
-    CONSTRAINT `supplierCommand_ibfk_1` FOREIGN KEY(`fkSupplier`) REFERENCES `supplier` (`pkSupplier`)
+    CONSTRAINT `supplierCommand_ibfk_1` FOREIGN KEY(`fkSupplier`) REFERENCES `Supplier` (`pkSupplier`)
 );
 CREATE TABLE IF NOT EXISTS `ClientCommand` (
     `pkClientCommand` 	INT AUTO_INCREMENT,
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `ClientCommand` (
 
     PRIMARY KEY(`pkClientCommand`),
     KEY `fkClient` (`fkClient`),
-    CONSTRAINT `clientCommand_ibfk_1` FOREIGN KEY(`fkClient`) REFERENCES `client` (`pkClient`)
+    CONSTRAINT `clientCommand_ibfk_1` FOREIGN KEY(`fkClient`) REFERENCES `Client` (`pkClient`)
 );
 
 CREATE TABLE IF NOT EXISTS `SupplyList` (
@@ -114,8 +114,8 @@ CREATE TABLE IF NOT EXISTS `SupplyList` (
 
     KEY `fkProduct` 		(`fkProduct`),
     KEY `fkSupplierCommand` (`fkSupplierCommand`),
-    CONSTRAINT `supplyList_ibfk_1` FOREIGN KEY(`fkProduct`) 		REFERENCES `product` 			(`pkProduct`),
-    CONSTRAINT `supplyList_ibfk_2` FOREIGN KEY(`fkSupplierCommand`) REFERENCES `supplierCommand` 	(`pkSupplierCommand`)
+    CONSTRAINT `supplyList_ibfk_1` FOREIGN KEY(`fkProduct`) 		REFERENCES `Product` 			(`pkProduct`),
+    CONSTRAINT `supplyList_ibfk_2` FOREIGN KEY(`fkSupplierCommand`) REFERENCES `SupplierCommand` 	(`pkSupplierCommand`)
 );
 CREATE TABLE IF NOT EXISTS `PurchaseList` (
     `fkProduct` 		INT NOT NULL,
@@ -125,6 +125,6 @@ CREATE TABLE IF NOT EXISTS `PurchaseList` (
 
     KEY `fkProduct` (`fkProduct`),
     KEY `fkClientCommand` (`fkClientCommand`),
-    CONSTRAINT `purchaseList_ibfk_1` FOREIGN KEY (`fkProduct`) 			REFERENCES `product` 		(`pkProduct`),
-    CONSTRAINT `purchaseList_ibfk_2` FOREIGN KEY (`fkClientCommand`) 	REFERENCES `clientCommand` 	(`pkClientCommand`)
+    CONSTRAINT `purchaseList_ibfk_1` FOREIGN KEY (`fkProduct`) 			REFERENCES `Product` 		(`pkProduct`),
+    CONSTRAINT `purchaseList_ibfk_2` FOREIGN KEY (`fkClientCommand`) 	REFERENCES `ClientCommand` 	(`pkClientCommand`)
 );
