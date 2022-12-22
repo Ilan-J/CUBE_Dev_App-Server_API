@@ -91,14 +91,14 @@ public static class DBConnection
 
     public static bool Delete(string table, int id)
     {
-        string sql = $"DELETE FROM `{table}` WHERE `pk_{table}` = {id}";
+        string sql = $"DELETE FROM `{table}` WHERE `pk{table}` = {id}";
 
         return Execute(sql);
     }
     
     public static int GetLastPk(string table)
     {
-        string sql = $"SELECT MAX(`pk_{table}`) FROM `{table}`";
+        string sql = $"SELECT MAX(`pk{table}`) FROM `{table}`";
 
         MySqlDataReader? reader = ExecuteReader(sql);
         if (reader is null || !reader.Read())

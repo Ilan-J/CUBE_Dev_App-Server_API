@@ -7,7 +7,7 @@ public static class SupplierService
 {
     public static bool GetAll(out List<Supplier> suppliers)
     {
-        string sql = "SELECT * FROM `supplier`";
+        string sql = "SELECT * FROM `Supplier`";
 
         suppliers = new List<Supplier>();
 
@@ -19,14 +19,14 @@ public static class SupplierService
         {
             suppliers.Add(new Supplier()
             {
-                PkSupplier  = reader.GetInt32("pk_supplier"),
+                PkSupplier  = reader.GetInt32("pkSupplier"),
 
                 Name        = reader.GetString("name"),
                 Email       = reader.GetString("email"),
 
                 Address     = reader.GetString("address"),
                 City        = reader.GetString("city"),
-                PostalCode  = reader.GetString("postal_code")
+                PostalCode  = reader.GetString("postalCode")
             });
         }
         reader.Close();
@@ -35,8 +35,7 @@ public static class SupplierService
 
     public static bool Get(int id, out Supplier? supplier)
     {
-        string sql = $"SELECT * FROM `supplier` " +
-            $"WHERE `pk_supplier` = {id}";
+        string sql = $"SELECT * FROM `Supplier` WHERE `pkSupplier` = {id}";
 
         MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
         if (reader is null)
@@ -53,14 +52,14 @@ public static class SupplierService
 
         supplier = new Supplier()
         {
-            PkSupplier  = reader.GetInt32("pk_supplier"),
+            PkSupplier  = reader.GetInt32("pkSupplier"),
 
             Name        = reader.GetString("name"),
             Email       = reader.GetString("email"),
 
             Address     = reader.GetString("address"),
             City        = reader.GetString("city"),
-            PostalCode  = reader.GetString("postal_code")
+            PostalCode  = reader.GetString("postalCode")
         };
         reader.Close();
         return true;
@@ -68,8 +67,8 @@ public static class SupplierService
 
     public static bool Add(Supplier supplier)
     {
-        string sql = "INSERT INTO `supplier` (`name`, `email`, `address`, `city`, `postal_code`) " +
-            "VALUES (@name, @email, @address, @city, @postal_code)";
+        string sql = "INSERT INTO `Supplier` (`name`, `email`, `address`, `city`, `postalCode`) " +
+            "VALUES (@name, @email, @address, @city, @postalCode)";
         
         MySqlCommand command = new(sql);
 
@@ -78,25 +77,25 @@ public static class SupplierService
 
         command.Parameters.AddWithValue("@address",     supplier.Address);
         command.Parameters.AddWithValue("@city",        supplier.City);
-        command.Parameters.AddWithValue("@postal_code", supplier.PostalCode);
+        command.Parameters.AddWithValue("@postalCode",  supplier.PostalCode);
 
         if (!DBConnection.Execute(command))
             return false;
 
-        supplier.PkSupplier = DBConnection.GetLastPk("supplier");
+        supplier.PkSupplier = DBConnection.GetLastPk("Supplier");
         return true;
     }
 
     public static bool Delete(int id)
     {
-        return DBConnection.Delete("supplier", id);
+        return DBConnection.Delete("Supplier", id);
     }
 
     public static bool Update(Supplier supplier)
     {
-        string sql = $"UPDATE `supplier` " +
-            $"SET `name` = @name, `email` = @email, `address` = @address, `city` = @city, `postal_code` = @postal_code " +
-            $"WHERE `pk_supplier` = {supplier.PkSupplier}";
+        string sql = $"UPDATE `Supplier` " +
+            $"SET `name` = @name, `email` = @email, `address` = @address, `city` = @city, `postalCode` = @postalCode " +
+            $"WHERE `pkSupplier` = {supplier.PkSupplier}";
         
         MySqlCommand command = new(sql);
 
@@ -105,7 +104,7 @@ public static class SupplierService
 
         command.Parameters.AddWithValue("@address",     supplier.Address);
         command.Parameters.AddWithValue("@city",        supplier.City);
-        command.Parameters.AddWithValue("@postal_code", supplier.PostalCode);
+        command.Parameters.AddWithValue("@postalCode",  supplier.PostalCode);
 
         if (!DBConnection.Execute(command))
             return false;

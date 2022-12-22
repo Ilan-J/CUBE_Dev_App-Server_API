@@ -7,7 +7,7 @@ public static class ProductService
 {
     public static bool GetAll(out List<Product> products)
     {
-        string sql = "SELECT * FROM `product`";
+        string sql = "SELECT * FROM `Product`";
 
         products = new List<Product>();
 
@@ -19,22 +19,22 @@ public static class ProductService
         {
             products.Add(new Product()
             {
-                PkProduct =     reader.GetInt32("pk_product"),
+                PkProduct       = reader.GetInt32("pkProduct"),
 
-                Name =          reader.GetString("name"),
-                Reference =     reader.GetString("reference"),
+                Name            = reader.GetString("name"),
+                Reference       = reader.GetString("reference"),
 
-                Price =         reader.GetInt32("price"),
-                TVA =           reader.GetInt32("tva"),
+                Price           = reader.GetInt32("price"),
+                TVA             = reader.GetInt32("tva"),
 
-                Age =           reader.GetInt32("age"),
-                Description =   reader.GetString("description"),
+                Age             = reader.GetInt32("age"),
+                Description     = reader.GetString("description"),
 
-                Stock =         reader.GetInt32("stock"),
-                StockMin =      reader.GetInt32("stock_min"),
+                Stock           = reader.GetInt32("stock"),
+                StockMin        = reader.GetInt32("stockMin"),
 
-                FkWineFamily =  reader.GetInt32("fk_wine_family"),
-                FkSupplier =    reader.GetInt32("fk_supplier")
+                FkWineFamily    = reader.GetInt32("fkWineFamily"),
+                FkSupplier      = reader.GetInt32("fkSupplier")
             });
         }
         reader.Close();
@@ -43,8 +43,7 @@ public static class ProductService
 
     public static bool Get(int id, out Product? product)
     {
-        string sql = $"SELECT * FROM `product` " +
-            $"WHERE `pk_product` = {id}";
+        string sql = $"SELECT * FROM `Product` WHERE `pkProduct` = {id}";
 
         MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
         if (reader is null)
@@ -61,22 +60,22 @@ public static class ProductService
         
         product = new Product()
         {
-            PkProduct =     reader.GetInt32("pk_product"),
+            PkProduct       = reader.GetInt32("pkProduct"),
 
-            Name =          reader.GetString("name"),
-            Reference =     reader.GetString("reference"),
+            Name            = reader.GetString("name"),
+            Reference       = reader.GetString("reference"),
 
-            Price =         reader.GetInt32("price"),
-            TVA =           reader.GetInt32("tva"),
+            Price           = reader.GetInt32("price"),
+            TVA             = reader.GetInt32("tva"),
 
-            Age =           reader.GetInt32("age"),
-            Description =   reader.GetString("description"),
+            Age             = reader.GetInt32("age"),
+            Description     = reader.GetString("description"),
 
-            Stock =         reader.GetInt32("stock"),
-            StockMin =      reader.GetInt32("stock_min"),
+            Stock           = reader.GetInt32("stock"),
+            StockMin        = reader.GetInt32("stockMin"),
 
-            FkWineFamily =  reader.GetInt32("fk_wine_family"),
-            FkSupplier =    reader.GetInt32("fk_supplier")
+            FkWineFamily    = reader.GetInt32("fkWineFamily"),
+            FkSupplier      = reader.GetInt32("fkSupplier")
         };
         reader.Close();
         return true;
@@ -84,8 +83,8 @@ public static class ProductService
 
     public static bool Add(Product product)
     {
-        string sql = "INSERT INTO `product` (name, reference, price, tva, age, description, stock, stock_min, fk_wine_family, fk_supplier) " +
-            "VALUES (@name, @reference, @price, @tva, @age, @description, @stock, @stock_min, @fk_wine_family, @fk_supplier)";
+        string sql = "INSERT INTO `Product` (name, reference, price, tva, age, description, stock, stockMin, fkWineFamily, fkSupplier) " +
+            "VALUES (@name, @reference, @price, @tva, @age, @description, @stock, @stockMin, @fkWineFamily, @fkSupplier)";
 
         MySqlCommand command = new(sql);
 
@@ -99,38 +98,38 @@ public static class ProductService
         command.Parameters.AddWithValue("@description",     product.Description);
 
         command.Parameters.AddWithValue("@stock",           product.Stock);
-        command.Parameters.AddWithValue("@stock_min",       product.StockMin);
+        command.Parameters.AddWithValue("@stockMin",        product.StockMin);
 
-        command.Parameters.AddWithValue("@fk_wine_family",  product.FkWineFamily);
-        command.Parameters.AddWithValue("@fk_supplier",     product.FkSupplier);
+        command.Parameters.AddWithValue("@fkWineFamily",    product.FkWineFamily);
+        command.Parameters.AddWithValue("@fkSupplier",      product.FkSupplier);
 
         if (!DBConnection.Execute(command))
             return false;
 
-        product.PkProduct = DBConnection.GetLastPk("product");
+        product.PkProduct = DBConnection.GetLastPk("Product");
         return true;
     }
 
     public static bool Delete(int id)
     {
-        return DBConnection.Delete("product", id);
+        return DBConnection.Delete("Product", id);
     }
 
     public static bool Update(Product product)
     {
-        string sql = $"UPDATE `product`                 " +
-            $"SET                                       " +
-            $"`name` =              @name,              " +
-            $"`reference` =         @reference,         " +
-            $"`price` =             @price,             " +
-            $"`tva` =               @tva,               " +
-            $"`age` =               @age,               " +
-            $"`description` =       @description,       " +
-            $"`stock` =             @stock,             " +
-            $"`stock_min` =         @stock_min,         " +
-            $"`fk_wine_family` =    @fk_wine_family,    " +
-            $"`fk_supplier` =       @fk_supplier        " +
-            $"WHERE `pk_product` =  {product.PkProduct}";
+        string sql = $"UPDATE `Product`             " +
+            $"SET                                   " +
+            $"`name`            = @name,            " +
+            $"`reference`       = @reference,       " +
+            $"`price`           = @price,           " +
+            $"`tva`             = @tva,             " +
+            $"`age`             = @age,             " +
+            $"`description`     = @description,     " +
+            $"`stock`           = @stock,           " +
+            $"`stockMin`        = @stockMin,        " +
+            $"`fkWineFamily`    = @fkWineFamily,    " +
+            $"`fkSupplier`      = @fkSupplier       " +
+            $"WHERE `pkProduct` = {product.PkProduct}";
 
         MySqlCommand command = new(sql);
 
@@ -144,10 +143,10 @@ public static class ProductService
         command.Parameters.AddWithValue("@description",     product.Description);
 
         command.Parameters.AddWithValue("@stock",           product.Stock);
-        command.Parameters.AddWithValue("@stock_min",       product.StockMin);
+        command.Parameters.AddWithValue("@stockMin",        product.StockMin);
 
-        command.Parameters.AddWithValue("@fk_wine_family",  product.FkWineFamily);
-        command.Parameters.AddWithValue("@fk_supplier",     product.FkSupplier);
+        command.Parameters.AddWithValue("@fkWineFamily",    product.FkWineFamily);
+        command.Parameters.AddWithValue("@fkSupplier",      product.FkSupplier);
 
         if (!DBConnection.Execute(command))
             return false;

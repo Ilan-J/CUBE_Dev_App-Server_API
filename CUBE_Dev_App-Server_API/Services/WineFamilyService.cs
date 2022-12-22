@@ -7,7 +7,7 @@ public static class WineFamilyService
 {
     public static bool GetAll(out List<WineFamily> wineFamilies)
     {
-        string sql = "SELECT * FROM `wine_family`";
+        string sql = "SELECT * FROM `WineFamily`";
 
         wineFamilies = new List<WineFamily>();
 
@@ -19,7 +19,7 @@ public static class WineFamilyService
         {
             wineFamilies.Add(new WineFamily()
             {
-                PkWineFamily    = reader.GetInt32("pk_wine_family"),
+                PkWineFamily    = reader.GetInt32("pkWineFamily"),
                 Name            = reader.GetString("name")
             });
         }
@@ -29,8 +29,7 @@ public static class WineFamilyService
 
     public static bool Get(int id, out WineFamily? wineFamily)
     {
-        string sql = $"SELECT * FROM `wine_family` " +
-            $"WHERE `pk_wine_family` = {id}";
+        string sql = $"SELECT * FROM `WineFamily` WHERE `pkWineFamily` = {id}";
         
         MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
         if (reader is null)
@@ -47,7 +46,7 @@ public static class WineFamilyService
 
         wineFamily = new WineFamily()
         {
-            PkWineFamily    = reader.GetInt32("pk_wine_family"),
+            PkWineFamily    = reader.GetInt32("pkWineFamily"),
             Name            = reader.GetString("name")
         };
         reader.Close();
@@ -56,7 +55,7 @@ public static class WineFamilyService
 
     public static bool Add(WineFamily wineFamily)
     {
-        string sql = "INSERT INTO `wine_family` (`name`) " +
+        string sql = "INSERT INTO `WineFamily` (`name`) " +
             "VALUES (@name)";
 
         MySqlCommand command = new(sql);
@@ -66,20 +65,20 @@ public static class WineFamilyService
         if (!DBConnection.Execute(command))
             return false;
 
-        wineFamily.PkWineFamily = DBConnection.GetLastPk("wine_family");
+        wineFamily.PkWineFamily = DBConnection.GetLastPk("WineFamily");
         return true;
     }
 
     public static bool Delete(int id)
     {
-        return DBConnection.Delete("wine_family", id);
+        return DBConnection.Delete("WineFamily", id);
     }
 
     public static bool Update(WineFamily wineFamily)
     {
-        string sql = $"UPDATE `wine_family` " +
+        string sql = $"UPDATE `WineFamily` " +
             $"SET `name` = @name " +
-            $"WHERE `pk_wine_family` = {wineFamily.PkWineFamily}";
+            $"WHERE `pkWineFamily` = {wineFamily.PkWineFamily}";
 
         MySqlCommand command = new(sql);
 
