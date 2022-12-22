@@ -16,9 +16,7 @@ public class Product
     public int          Stock { get; set; }
     public int          StockMin { get; set; }
 
-    public int          FkWineFamily { get; set; }
-    public WineFamily?  WineFamily { get; set; }
+    public WineFamily   WineFamily { get; set; }    = new();
 
-    public int          FkSupplier { get; set; }
-    public Supplier?    Supplier { get; set; }
+    public Supplier     Supplier { get; set; }      = new();
 }

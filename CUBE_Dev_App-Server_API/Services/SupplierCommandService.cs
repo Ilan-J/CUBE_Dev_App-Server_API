@@ -5,11 +5,11 @@ namespace CUBE_Dev_App_Server_API.Services;
 
 public static class SupplierCommandService
 {
-    public static bool GetAll(out List<object> supplierCommands)
+    public static bool GetAll(out List<SupplierCommand> supplierCommands)
     {
         string sql = "SELECT * FROM `SupplierCommand`";
 
-        supplierCommands = new List<object>();
+        supplierCommands = new List<SupplierCommand>();
 
         MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
         if (reader is null)
@@ -17,7 +17,7 @@ public static class SupplierCommandService
 
         while (reader.Read())
         {
-            supplierCommands.Add(new object()
+            supplierCommands.Add(new SupplierCommand()
             {
                 
             });
@@ -26,7 +26,7 @@ public static class SupplierCommandService
         return true;
     }
 
-    public static bool Get(int id, out object? supplierCommand)
+    public static bool Get(int id, out SupplierCommand? supplierCommand)
     {
         string sql = $"SELECT * FROM `SupplierCommand` WHERE `pkSupplierCommand` = {id}";
 
@@ -43,7 +43,7 @@ public static class SupplierCommandService
             return true;
         }
 
-        supplierCommand = new object()
+        supplierCommand = new SupplierCommand()
         {
 
         };
@@ -51,19 +51,19 @@ public static class SupplierCommandService
         return true;
     }
 
-    public static bool Add(object supplierCommand)
+    public static bool Add(SupplierCommand supplierCommand)
     {
         string sql = "INSERT INTO `SupplierCommand` (``) " +
-            "VALUES ()";
+            "VALUES (@)";
 
         MySqlCommand command = new(sql);
 
-        command.Parameters.AddWithValue("@name", supplierCommand);
+        command.Parameters.AddWithValue("@", supplierCommand);
 
         if (!DBConnection.Execute(command))
             return false;
 
-        supplierCommand = DBConnection.GetLastPk("WineFamily");
+        supplierCommand.PkSupplierCommand = DBConnection.GetLastPk("SupplierCommand");
         return true;
     }
 
@@ -72,15 +72,15 @@ public static class SupplierCommandService
         return DBConnection.Delete("SupplierCommand", id);
     }
 
-    public static bool Update(object supplierCommand)
+    public static bool Update(SupplierCommand supplierCommand)
     {
         string sql = $"UPDATE `SupplierCommand` " +
-            $"SET `` =  " +
-            $"WHERE `pkSupplierCommand` = {supplierCommand}";
+            $"SET `` = @ " +
+            $"WHERE `pkSupplierCommand` = {supplierCommand.PkSupplierCommand}";
 
         MySqlCommand command = new(sql);
 
-        command.Parameters.AddWithValue("", supplierCommand);
+        command.Parameters.AddWithValue("@", supplierCommand);
 
         if (!DBConnection.Execute(command))
             return false;
