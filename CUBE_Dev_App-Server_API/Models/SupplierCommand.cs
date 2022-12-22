@@ -9,7 +9,7 @@ public class SupplierCommand
     public float        TotalCost { get; set; }
     public float        TransportCost { get; set; }
 
-    public int          FkSupplier { get; set; }
+    public Supplier     Supplier { get; set; }      = new();
 
     public Product[]    Products { get; set; }      = Array.Empty<Product>();
 }

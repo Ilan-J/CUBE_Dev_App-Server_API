@@ -24,8 +24,8 @@ public class ProductController : ControllerBase
 
         products.ForEach(product =>
         {
-            product.WineFamily  = wineFamilies[product.FkWineFamily - 1];
-            product.Supplier    = suppliers[product.FkSupplier - 1];
+            product.WineFamily  = wineFamilies[product.WineFamily.PkWineFamily - 1];
+            product.Supplier    = suppliers[product.Supplier.PkSupplier - 1];
         });
 
         return Ok(products);
@@ -40,10 +40,10 @@ public class ProductController : ControllerBase
         if (product is null)
             return NotFound();
 
-        WineFamilyService.Get(product.FkWineFamily, out WineFamily? wineFamily);
+        WineFamilyService.Get(product.WineFamily.PkWineFamily, out WineFamily? wineFamily);
         product.WineFamily = wineFamily;
 
-        SupplierService.Get(product.FkSupplier, out Supplier? supplier);
+        SupplierService.Get(product.Supplier.PkSupplier, out Supplier? supplier);
         product.Supplier = supplier;
 
         return Ok(product);

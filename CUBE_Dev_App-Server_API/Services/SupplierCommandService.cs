@@ -19,7 +19,17 @@ public static class SupplierCommandService
         {
             supplierCommands.Add(new SupplierCommand()
             {
-                
+                PkSupplierCommand   = reader.GetInt32("pkSupplierCommand"),
+
+                BuyingDate          = reader.GetDateTime("buyingDate"),
+
+                TotalCost           = reader.GetFloat("totalCost"),
+                TransportCost       = reader.GetFloat("transportCost"),
+
+                Supplier = new Supplier()
+                {
+                    PkSupplier = reader.GetInt32("fkSupplier")
+                }
             });
         }
         reader.Close();
@@ -45,7 +55,17 @@ public static class SupplierCommandService
 
         supplierCommand = new SupplierCommand()
         {
+            PkSupplierCommand   = reader.GetInt32("pkSupplierCommand"),
 
+            BuyingDate          = reader.GetDateTime("buyingDate"),
+
+            TotalCost           = reader.GetFloat("totalCost"),
+            TransportCost       = reader.GetFloat("transportCost"),
+
+            Supplier = new Supplier()
+            {
+                PkSupplier = reader.GetInt32("fkSupplier")
+            }
         };
         reader.Close();
         return true;
@@ -53,12 +73,15 @@ public static class SupplierCommandService
 
     public static bool Add(SupplierCommand supplierCommand)
     {
-        string sql = "INSERT INTO `SupplierCommand` (``) " +
-            "VALUES (@)";
+        string sql = "INSERT INTO `SupplierCommand` (`buyingDate`, `totalCost`, `transportCost`, `fkSupplier`) " +
+            "VALUES (@buyingDate, @totalCost, @transportCost, @fkSupplier)";
 
         MySqlCommand command = new(sql);
 
-        command.Parameters.AddWithValue("@", supplierCommand);
+        command.Parameters.AddWithValue("@buyingDate",      supplierCommand.BuyingDate);
+        command.Parameters.AddWithValue("@totalCost",       supplierCommand.TotalCost);
+        command.Parameters.AddWithValue("@transportCost",   supplierCommand.TransportCost);
+        command.Parameters.AddWithValue("@fkSupplier",      supplierCommand.Supplier.PkSupplier);
 
         if (!DBConnection.Execute(command))
             return false;

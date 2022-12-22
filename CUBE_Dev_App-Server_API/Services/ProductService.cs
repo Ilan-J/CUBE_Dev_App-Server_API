@@ -33,8 +33,14 @@ public static class ProductService
                 Stock           = reader.GetInt32("stock"),
                 StockMin        = reader.GetInt32("stockMin"),
 
-                FkWineFamily    = reader.GetInt32("fkWineFamily"),
-                FkSupplier      = reader.GetInt32("fkSupplier")
+                WineFamily = new WineFamily()
+                {
+                    PkWineFamily = reader.GetInt32("fkWineFamily")
+                },
+                Supplier = new Supplier()
+                {
+                    PkSupplier = reader.GetInt32("fkSupplier")
+                }
             });
         }
         reader.Close();
@@ -74,8 +80,14 @@ public static class ProductService
             Stock           = reader.GetInt32("stock"),
             StockMin        = reader.GetInt32("stockMin"),
 
-            FkWineFamily    = reader.GetInt32("fkWineFamily"),
-            FkSupplier      = reader.GetInt32("fkSupplier")
+            WineFamily = new WineFamily()
+            {
+                PkWineFamily = reader.GetInt32("fkWineFamily")
+            },
+            Supplier = new Supplier()
+            {
+                PkSupplier = reader.GetInt32("fkSupplier")
+            }
         };
         reader.Close();
         return true;
@@ -100,8 +112,8 @@ public static class ProductService
         command.Parameters.AddWithValue("@stock",           product.Stock);
         command.Parameters.AddWithValue("@stockMin",        product.StockMin);
 
-        command.Parameters.AddWithValue("@fkWineFamily",    product.FkWineFamily);
-        command.Parameters.AddWithValue("@fkSupplier",      product.FkSupplier);
+        command.Parameters.AddWithValue("@fkWineFamily",    product.WineFamily.PkWineFamily);
+        command.Parameters.AddWithValue("@fkSupplier",      product.Supplier.PkSupplier);
 
         if (!DBConnection.Execute(command))
             return false;
@@ -145,8 +157,8 @@ public static class ProductService
         command.Parameters.AddWithValue("@stock",           product.Stock);
         command.Parameters.AddWithValue("@stockMin",        product.StockMin);
 
-        command.Parameters.AddWithValue("@fkWineFamily",    product.FkWineFamily);
-        command.Parameters.AddWithValue("@fkSupplier",      product.FkSupplier);
+        command.Parameters.AddWithValue("@fkWineFamily",    product.WineFamily.PkWineFamily);
+        command.Parameters.AddWithValue("@fkSupplier",      product.Supplier.PkSupplier);
 
         if (!DBConnection.Execute(command))
             return false;
