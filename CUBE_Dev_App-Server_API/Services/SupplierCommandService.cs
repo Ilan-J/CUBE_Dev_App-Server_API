@@ -98,12 +98,15 @@ public static class SupplierCommandService
     public static bool Update(SupplierCommand supplierCommand)
     {
         string sql = $"UPDATE `SupplierCommand` " +
-            $"SET `` = @ " +
+            $"SET `buyingDate` = @buyingDate, `totalCost` = @totalCost, `transportCost` = @transportCost, `fkSupplier` = @fkSupplier " +
             $"WHERE `pkSupplierCommand` = {supplierCommand.PkSupplierCommand}";
 
         MySqlCommand command = new(sql);
 
-        command.Parameters.AddWithValue("@", supplierCommand);
+        command.Parameters.AddWithValue("@buyingDate",      supplierCommand.BuyingDate);
+        command.Parameters.AddWithValue("@totalCost",       supplierCommand.TotalCost);
+        command.Parameters.AddWithValue("@transportCost",   supplierCommand.TransportCost);
+        command.Parameters.AddWithValue("@fkSupplier",      supplierCommand.Supplier.PkSupplier);
 
         if (!DBConnection.Execute(command))
             return false;

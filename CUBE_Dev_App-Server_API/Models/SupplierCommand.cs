@@ -2,14 +2,14 @@
 
 public class SupplierCommand
 {
-    public int          PkSupplierCommand { get; set; }
+    public int              PkSupplierCommand { get; set; }
 
-    public DateTime     BuyingDate { get; set; }    = DateTime.Now;
+    public DateTime         BuyingDate { get; set; }    = DateTime.Now;
     
-    public float        TotalCost { get; set; }
-    public float        TransportCost { get; set; }
+    public float            TotalCost { get; set; }
+    public float            TransportCost { get; set; }
 
-    public Supplier     Supplier { get; set; }      = new();
+    public Supplier         Supplier { get; set; }      = new();
 
-    public Product[]    Products { get; set; }      = Array.Empty<Product>();
+    public List<Product>    Products { get; set; }      = new();
 }

@@ -51,9 +51,13 @@ public static class DBConnection
     /// <returns>MySqlDataReader</returns>
     public static MySqlDataReader? ExecuteReader(string sql)
     {
+        if (!Connection.Ping() && !Open())
+            return null;
+
         try
         {
-            return new MySqlCommand(sql, Connection).ExecuteReader();
+            MySqlDataReader? mySqlDataReader = new MySqlCommand(sql, Connection).ExecuteReader();
+            return mySqlDataReader;
         }
         catch (MySqlException ex)
         {
@@ -63,6 +67,9 @@ public static class DBConnection
     }
     public static bool Execute(string sql)
     {
+        if (!Connection.Ping() && !Open())
+            return false;
+
         try
         {
             new MySqlCommand(sql, Connection).ExecuteNonQuery();
