@@ -13,26 +13,7 @@ public class SupplierCommandController : ControllerBase
     {
         if (!SupplierCommandService.GetAll(out List<SupplierCommand> supplierCommands))
             return StatusCode(500);
-
-        if (!SupplyListService.GetAll(out List<SupplyList> supplyLists))
-            return StatusCode(500);
-
-        if (!ProductService.GetAll(out List<Product> products))
-            return StatusCode(500);
-
-        supplierCommands.ForEach(supplierCommand =>
-        {
-            List<SupplyList> supplyList = supplyLists.FindAll(delegate (SupplyList list)
-            {
-                return list.SupplierCommand.PkSupplierCommand == supplierCommand.PkSupplierCommand;
-            });
-
-            supplyList.ForEach(supplyList =>
-            {
-                supplierCommand.Products.Add(products[supplyList.Product.PkProduct - 1]);
-            });
-        });
-
+        
         return Ok(supplierCommands);
     }
 

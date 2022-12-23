@@ -8,10 +8,6 @@ namespace CUBE_Dev_App_Server_API.Controllers;
 [Route("[controller]")]
 public class ClientController : ControllerBase
 {
-    public ClientController()
-    {
-    }
-
     [HttpGet]
     public IActionResult GetAll()
     {

@@ -1,7 +1,7 @@
 USE `db_negosud`;
 
-DROP TABLE IF EXISTS `SupplyList`;
-DROP TABLE IF EXISTS `PurchaseList`;
+DROP TABLE IF EXISTS `SupplierProductList`;
+DROP TABLE IF EXISTS `ClientProductList`;
 
 DROP TABLE IF EXISTS `SupplierCommand`;
 DROP TABLE IF EXISTS `ClientCommand`;

@@ -24,6 +24,7 @@ INSERT INTO `Product` (
     `reference`,
     `price`,
     `tva`,
+    `priceTTC`,
     `description`,
     `age`,
     `stock`,
@@ -36,6 +37,7 @@ VALUES
         'TA06',
         24.99,
         20,
+        29.988,
         "",
         2,
         57,
@@ -48,6 +50,7 @@ VALUES
         'TA13',
         29.99,
         20,
+        35.988,
         "",
         '3',
         33,
@@ -60,6 +63,7 @@ VALUES
         'PE03ELV',
         14.00,
         20,
+        16.8,
         "",
         '4',
         69,
@@ -69,15 +73,17 @@ VALUES
     );
 
 INSERT INTO `SupplierCommand` (
+	`commandType`,
+    `commandStatus`,
 	`totalCost`,
     `transportCost`,
     `fkSupplier`
     )
 VALUES
-	(1849.3,	5.25,	1),
-    (420,		8.3,	2);
+	(0,	0,	1849.3,	5.25,	1),
+    (0,	0,	420,	8.3,	2);
 
-INSERT INTO `SupplyList` (
+INSERT INTO `SupplierProductList` (
 	`fkProduct`,
     `fkSupplierCommand`,
     `quantity`
@@ -99,3 +105,30 @@ VALUES
         'Patrick',
         'Balkany'
     );
+
+INSERT INTO `ClientCommand` (
+    `commandStatus`,
+
+    `address`,
+    `city`,
+	`region`,
+    `postalCode`,
+	`country`,
+	
+    `totalCost`,
+    `transportCost`,
+
+    `fkClient`
+    )
+VALUES
+	(2,	"35 Rue de la Détente",	"Levallois Perret",	"Île-de-France",	"92300",	"France",	29.99,	15,	1),
+    (0,	"35 Rue du Stress",		"Levallois Perret",	"Île-de-France",	"92300",	"France",	149.95,	20,	1);
+
+INSERT INTO `ClientProductList` (
+    `fkClientCommand`,
+	`fkProduct`,
+    `quantity`
+    )
+VALUES
+	(1, 2, 1),
+    (2, 2, 5);

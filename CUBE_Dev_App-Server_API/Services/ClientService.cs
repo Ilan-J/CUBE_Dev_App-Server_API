@@ -48,9 +48,9 @@ public static class ClientService
             client = null;
             return false;
         }
-
         if (!reader.Read())
         {
+            reader.Close();
             client = null;
             return false;
         }
@@ -108,18 +108,18 @@ public static class ClientService
 
     public static bool Update(Client client)
     {
-        string sql = $"UPDATE `Client`          " +
-            $"SET                               " +
-            $"`email`           = @email,       " +
-            $"`password`        = @password,    " +
-            $"`firstname`       = @firstname,   " +
-            $"`lastname`        = @lastname,    " +
-            $"`address`         = @address,     " +
-            $"`city`            = @city,        " +
-            $"`region`          = @region,      " +
-            $"`postalCode`      = @postalCode,  " +
-            $"`country`         = @country      " +
-            $"WHERE `pkClient`  = {client.PkClient}";
+        string sql = $@"UPDATE `Client`
+            SET
+            `email`           = @email,
+            `password`        = @password,
+            `firstname`       = @firstname,
+            `lastname`        = @lastname,
+            `address`         = @address,
+            `city`            = @city,
+            `region`          = @region,
+            `postalCode`      = @postalCode,
+            `country`         = @country
+            WHERE `pkClient`  = {client.PkClient}";
 
         MySqlCommand command = new(sql);
 

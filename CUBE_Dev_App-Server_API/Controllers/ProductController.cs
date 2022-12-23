@@ -1,7 +1,6 @@
 ﻿using CUBE_Dev_App_Server_API.Models;
 using CUBE_Dev_App_Server_API.Services;
 using Microsoft.AspNetCore.Mvc;
-using MySqlX.XDevAPI;
 
 namespace CUBE_Dev_App_Server_API.Controllers;
 
@@ -9,25 +8,12 @@ namespace CUBE_Dev_App_Server_API.Controllers;
 [Route("[controller]")]
 public class ProductController : ControllerBase
 {
-    public ProductController()
-    {
-    }
-
     [HttpGet]
     public IActionResult GetAll()
     {
         if (!ProductService.GetAll(out List<Product> products))
             return StatusCode(500);
-
-        WineFamilyService.GetAll(out List<WineFamily> wineFamilies);
-        SupplierService.GetAll(out List<Supplier> suppliers);
-
-        products.ForEach(product =>
-        {
-            product.WineFamily  = wineFamilies[product.WineFamily.PkWineFamily - 1];
-            product.Supplier    = suppliers[product.Supplier.PkSupplier - 1];
-        });
-
+        
         return Ok(products);
     }
 
@@ -39,13 +25,7 @@ public class ProductController : ControllerBase
 
         if (product is null)
             return NotFound();
-
-        WineFamilyService.Get(product.WineFamily.PkWineFamily, out WineFamily? wineFamily);
-        product.WineFamily = wineFamily;
-
-        SupplierService.Get(product.Supplier.PkSupplier, out Supplier? supplier);
-        product.Supplier = supplier;
-
+        
         return Ok(product);
     }
 

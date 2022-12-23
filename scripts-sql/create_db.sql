@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS `Product` (
 
     `price` 			FLOAT NOT NULL,
     `tva` 				INT NOT NULL,
+    `priceTTC`			FLOAT NOT NULL,
 
     `age` 				INT DEFAULT 0,
     `description` 		TEXT,
@@ -72,14 +73,16 @@ CREATE TABLE IF NOT EXISTS `Product` (
 );
 
 CREATE TABLE IF NOT EXISTS `SupplierCommand` (
-    `pkSupplierCommand` 	INT AUTO_INCREMENT,
+    `pkSupplierCommand` INT AUTO_INCREMENT,
 
-    `buyingDate` 			TIMESTAMP DEFAULT NOW(),
+    `commandDate` 		TIMESTAMP DEFAULT NOW(),
+    `commandType`		INT NOT NULL,
+    `commandStatus`		INT NOT NULL,
 
-    `totalCost` 			FLOAT NOT NULL,
-    `transportCost` 		FLOAT DEFAULT 0,
+    `totalCost` 		FLOAT NOT NULL,
+    `transportCost` 	FLOAT DEFAULT 0,
 
-    `fkSupplier` 			INT NOT NULL,
+    `fkSupplier` 		INT NOT NULL,
 
     PRIMARY KEY(`pkSupplierCommand`),
     KEY `fkSupplier` (`fkSupplier`),
@@ -88,7 +91,8 @@ CREATE TABLE IF NOT EXISTS `SupplierCommand` (
 CREATE TABLE IF NOT EXISTS `ClientCommand` (
     `pkClientCommand` 	INT AUTO_INCREMENT,
 
-    `buyingDate` 		TIMESTAMP DEFAULT NOW(),
+    `commandDate` 		TIMESTAMP DEFAULT NOW(),
+    `commandStatus`		INT NOT NULL,
 
     `address` 			VARCHAR(255) NOT NULL,
     `city` 				VARCHAR(255) NOT NULL,
@@ -106,7 +110,7 @@ CREATE TABLE IF NOT EXISTS `ClientCommand` (
     CONSTRAINT `clientCommand_ibfk_1` FOREIGN KEY(`fkClient`) REFERENCES `Client` (`pkClient`)
 );
 
-CREATE TABLE IF NOT EXISTS `SupplyList` (
+CREATE TABLE IF NOT EXISTS `SupplierProductList` (
     `fkProduct` 		INT NOT NULL,
     `fkSupplierCommand` INT NOT NULL,
 
@@ -117,9 +121,9 @@ CREATE TABLE IF NOT EXISTS `SupplyList` (
     CONSTRAINT `supplyList_ibfk_1` FOREIGN KEY(`fkProduct`) 		REFERENCES `Product` 			(`pkProduct`),
     CONSTRAINT `supplyList_ibfk_2` FOREIGN KEY(`fkSupplierCommand`) REFERENCES `SupplierCommand` 	(`pkSupplierCommand`)
 );
-CREATE TABLE IF NOT EXISTS `PurchaseList` (
-    `fkProduct` 		INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `ClientProductList` (
     `fkClientCommand` 	INT NOT NULL,
+    `fkProduct` 		INT NOT NULL,
 
     `quantity` 			INT NOT NULL,
 

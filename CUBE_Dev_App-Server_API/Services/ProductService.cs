@@ -44,6 +44,18 @@ public static class ProductService
             });
         }
         reader.Close();
+
+        if (!WineFamilyService.GetAll(out List<WineFamily> wineFamilies))
+            return false;
+
+        if (!SupplierService.GetAll(out List<Supplier> suppliers))
+            return false;
+
+        products.ForEach(product =>
+        {
+            product.WineFamily  = wineFamilies[ product.WineFamily.PkWineFamily - 1];
+            product.Supplier    = suppliers[    product.Supplier.PkSupplier - 1];
+        });
         return true;
     }
 
@@ -90,6 +102,19 @@ public static class ProductService
             }
         };
         reader.Close();
+
+        if (!WineFamilyService.Get(product.WineFamily.PkWineFamily, out WineFamily? wineFamily))
+            return false;
+        if (wineFamily is null)
+            return false;
+        product.WineFamily = wineFamily;
+
+        if (!SupplierService.Get(product.Supplier.PkSupplier, out Supplier? supplier))
+            return false;
+        if (supplier is null)
+            return false;
+        product.Supplier = supplier;
+
         return true;
     }
 
@@ -119,6 +144,19 @@ public static class ProductService
             return false;
 
         product.PkProduct = DBConnection.GetLastPk("Product");
+
+        if (!WineFamilyService.Get(product.WineFamily.PkWineFamily, out WineFamily? wineFamily))
+            return false;
+        if (wineFamily is null)
+            return false;
+        product.WineFamily = wineFamily;
+
+        if (!SupplierService.Get(product.Supplier.PkSupplier, out Supplier? supplier))
+            return false;
+        if (supplier is null)
+            return false;
+        product.Supplier = supplier;
+
         return true;
     }
 
