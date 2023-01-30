@@ -35,13 +35,13 @@ public class ClientController : ControllerBase
         if (!ClientService.Add(client))
             return StatusCode(500);
 
-        return CreatedAtAction(nameof(Create), new { pkClient = client.PkClient }, client);
+        return CreatedAtAction(nameof(Create), new { pkClient = client.IDClient }, client);
     }
 
     [HttpPut("{id}")]
     public IActionResult Update(int id, Client client)
     {
-        if (id != client.PkClient)
+        if (id != client.IDClient)
             return BadRequest();
 
         if (!ClientService.Get(id, out Client? existingClient))

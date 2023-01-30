@@ -39,13 +39,13 @@ public class WineFamilyController : ControllerBase
         if (!WineFamilyService.Add(wineFamily))
             return StatusCode(500);
 
-        return CreatedAtAction(nameof(Create), new { pkWineFamily = wineFamily.PkWineFamily }, wineFamily);
+        return CreatedAtAction(nameof(Create), new { pkWineFamily = wineFamily.IDWineFamily }, wineFamily);
     }
 
     [HttpPut("{id}")]
     public IActionResult Update(int id, WineFamily wineFamily)
     {
-        if (id != wineFamily.PkWineFamily)
+        if (id != wineFamily.IDWineFamily)
             return BadRequest();
 
         if (!WineFamilyService.Get(id, out WineFamily? existingWineFamily))

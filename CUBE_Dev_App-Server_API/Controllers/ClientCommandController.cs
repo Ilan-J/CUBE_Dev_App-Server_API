@@ -46,13 +46,13 @@ public class ClientCommandController : ControllerBase
         if (!ClientCommandService.Add(clientCommand))
             return StatusCode(500);
 
-        return CreatedAtAction(nameof(Create), new { pkClientCommand = clientCommand.PkClientCommand }, clientCommand);
+        return CreatedAtAction(nameof(Create), new { pkClientCommand = clientCommand.IDClientCommand }, clientCommand);
     }
 
     [HttpPut("{id}")]
     public IActionResult Update(int id, ClientCommand clientCommand)
     {
-        if (id != clientCommand.PkClientCommand)
+        if (id != clientCommand.IDClientCommand)
             return BadRequest();
 
         if (!ClientCommandService.Get(id, out ClientCommand? existingClientCommand))

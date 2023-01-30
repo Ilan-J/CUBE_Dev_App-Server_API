@@ -11,7 +11,7 @@ public class ProductController : ControllerBase
     [HttpGet]
     public IActionResult GetAll()
     {
-        if (!ProductService.GetAll(out List<Product> products))
+        if (!ProductService.GetAll(out List<Article> products))
             return StatusCode(500);
         
         return Ok(products);
@@ -20,7 +20,7 @@ public class ProductController : ControllerBase
     [HttpGet("{id}")]
     public IActionResult Get(int id)
     {
-        if (!ProductService.Get(id, out Product? product))
+        if (!ProductService.Get(id, out Article? product))
             return StatusCode(500);
 
         if (product is null)
@@ -30,21 +30,21 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Create(Product product)
+    public IActionResult Create(Article product)
     {
         if (!ProductService.Add(product))
             return StatusCode(500);
 
-        return CreatedAtAction(nameof(Create), new { pkProduct = product.PkProduct }, product);
+        return CreatedAtAction(nameof(Create), new { pkProduct = product.IDArticle }, product);
     }
 
     [HttpPut("{id}")]
-    public IActionResult Update(int id, Product product)
+    public IActionResult Update(int id, Article product)
     {
-        if (id != product.PkProduct)
+        if (id != product.IDArticle)
             return BadRequest();
 
-        if (!ProductService.Get(id, out Product? existingProduct))
+        if (!ProductService.Get(id, out Article? existingProduct))
             return StatusCode(500);
 
         if (existingProduct is null)
@@ -59,7 +59,7 @@ public class ProductController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        if (!ProductService.Get(id, out Product? product))
+        if (!ProductService.Get(id, out Article? product))
             return StatusCode(500);
 
         if (product is null)

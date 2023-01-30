@@ -39,13 +39,13 @@ public class SupplierController : ControllerBase
         if (!SupplierService.Add(supplier))
             return StatusCode(500);
 
-        return CreatedAtAction(nameof(Create), new { pkSupplier = supplier.PkSupplier }, supplier);
+        return CreatedAtAction(nameof(Create), new { pkSupplier = supplier.IDSupplier }, supplier);
     }
 
     [HttpPut("{id}")]
     public IActionResult Update(int id, Supplier supplier)
     {
-        if (id != supplier.PkSupplier)
+        if (id != supplier.IDSupplier)
             return BadRequest();
         
         if (!SupplierService.Get(id, out Supplier? existingSupplier))

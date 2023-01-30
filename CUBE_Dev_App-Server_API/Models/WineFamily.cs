@@ -2,7 +2,6 @@
 
 public class WineFamily
 {
-    public int      PkWineFamily    { get; set; }
-
-    public string   Name            { get; set; } = string.Empty;
+    public int IDWineFamily { get; set; }
+    public string Name { get; set; } = string.Empty;
 }

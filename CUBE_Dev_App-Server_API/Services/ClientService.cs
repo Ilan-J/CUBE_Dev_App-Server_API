@@ -19,7 +19,7 @@ public static class ClientService
         {
             clients.Add(new Client()
             {
-                PkClient    = reader.GetInt32("pkClient"),
+                IDClient    = reader.GetInt32("pkClient"),
 
                 Email       = reader.GetString("email"),
                 Password    = reader.GetString("password"),
@@ -28,7 +28,7 @@ public static class ClientService
                 Lastname    = reader.GetString("lastname"),
 
                 Address     = reader.GetString("address"),
-                City        = reader.GetString("city"),
+                Town        = reader.GetString("city"),
                 Region      = reader.GetString("region"),
                 PostalCode  = reader.GetString("postalCode"),
                 Country     = reader.GetString("country")
@@ -57,7 +57,7 @@ public static class ClientService
 
         client = new Client()
         {
-            PkClient    = reader.GetInt32("pkClient"),
+            IDClient    = reader.GetInt32("pkClient"),
 
             Email       = reader.GetString("email"),
             Password    = reader.GetString("password"),
@@ -66,7 +66,7 @@ public static class ClientService
             Lastname    = reader.GetString("lastname"),
 
             Address     = reader.GetString("address"),
-            City        = reader.GetString("city"),
+            Town        = reader.GetString("city"),
             Region      = reader.GetString("region"),
             PostalCode  = reader.GetString("postalCode"),
             Country     = reader.GetString("country")
@@ -89,7 +89,7 @@ public static class ClientService
         command.Parameters.AddWithValue("@lastname",    client.Lastname);
 
         command.Parameters.AddWithValue("@address",     client.Address);
-        command.Parameters.AddWithValue("@city",        client.City);
+        command.Parameters.AddWithValue("@city",        client.Town);
         command.Parameters.AddWithValue("@region",      client.Region);
         command.Parameters.AddWithValue("@postalCode",  client.PostalCode);
         command.Parameters.AddWithValue("@country",     client.Country);
@@ -97,7 +97,7 @@ public static class ClientService
         if (!DBConnection.Execute(command))
             return false;
 
-        client.PkClient = DBConnection.GetLastPk("Client");
+        client.IDClient = DBConnection.GetLastPk("Client");
         return true;
     }
 
@@ -119,7 +119,7 @@ public static class ClientService
             `region`          = @region,
             `postalCode`      = @postalCode,
             `country`         = @country
-            WHERE `pkClient`  = {client.PkClient}";
+            WHERE `pkClient`  = {client.IDClient}";
 
         MySqlCommand command = new(sql);
 
@@ -130,7 +130,7 @@ public static class ClientService
         command.Parameters.AddWithValue("@lastname",    client.Lastname);
 
         command.Parameters.AddWithValue("@address",     client.Address);
-        command.Parameters.AddWithValue("@city",        client.City);
+        command.Parameters.AddWithValue("@city",        client.Town);
         command.Parameters.AddWithValue("@region",      client.Region);
         command.Parameters.AddWithValue("@postalCode",  client.PostalCode);
         command.Parameters.AddWithValue("@country",     client.Country);

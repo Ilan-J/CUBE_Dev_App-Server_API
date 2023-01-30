@@ -5,11 +5,11 @@ namespace CUBE_Dev_App_Server_API.Services;
 
 public static class ProductService
 {
-    public static bool GetAll(out List<Product> products)
+    public static bool GetAll(out List<Article> products)
     {
         string sql = "SELECT * FROM `Product`";
 
-        products = new List<Product>();
+        products = new List<Article>();
 
         MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
         if (reader is null)
@@ -17,29 +17,29 @@ public static class ProductService
 
         while (reader.Read())
         {
-            products.Add(new Product()
+            products.Add(new Article()
             {
-                PkProduct       = reader.GetInt32("pkProduct"),
+                IDArticle       = reader.GetInt32("pkProduct"),
 
                 Name            = reader.GetString("name"),
                 Reference       = reader.GetString("reference"),
 
-                Price           = reader.GetInt32("price"),
+                BuyingPrice           = reader.GetInt32("price"),
                 TVA             = reader.GetInt32("tva"),
 
-                Age             = reader.GetInt32("age"),
+                WineYear             = reader.GetInt32("age"),
                 Description     = reader.GetString("description"),
 
-                Stock           = reader.GetInt32("stock"),
-                StockMin        = reader.GetInt32("stockMin"),
+                Quantity           = reader.GetInt32("stock"),
+                MinQuantity        = reader.GetInt32("stockMin"),
 
                 WineFamily = new WineFamily()
                 {
-                    PkWineFamily = reader.GetInt32("fkWineFamily")
+                    IDWineFamily = reader.GetInt32("fkWineFamily")
                 },
                 Supplier = new Supplier()
                 {
-                    PkSupplier = reader.GetInt32("fkSupplier")
+                    IDSupplier = reader.GetInt32("fkSupplier")
                 }
             });
         }
@@ -53,13 +53,13 @@ public static class ProductService
 
         products.ForEach(product =>
         {
-            product.WineFamily  = wineFamilies[ product.WineFamily.PkWineFamily - 1];
-            product.Supplier    = suppliers[    product.Supplier.PkSupplier - 1];
+            product.WineFamily  = wineFamilies[ product.WineFamily.IDWineFamily - 1];
+            product.Supplier    = suppliers[    product.Supplier.IDSupplier - 1];
         });
         return true;
     }
 
-    public static bool Get(int id, out Product? product)
+    public static bool Get(int id, out Article? product)
     {
         string sql = $"SELECT * FROM `Product` WHERE `pkProduct` = {id}";
 
@@ -76,40 +76,40 @@ public static class ProductService
             return true;
         }
         
-        product = new Product()
+        product = new Article()
         {
-            PkProduct       = reader.GetInt32("pkProduct"),
+            IDArticle       = reader.GetInt32("pkProduct"),
 
             Name            = reader.GetString("name"),
             Reference       = reader.GetString("reference"),
 
-            Price           = reader.GetInt32("price"),
+            BuyingPrice           = reader.GetInt32("price"),
             TVA             = reader.GetInt32("tva"),
 
-            Age             = reader.GetInt32("age"),
+            WineYear             = reader.GetInt32("age"),
             Description     = reader.GetString("description"),
 
-            Stock           = reader.GetInt32("stock"),
-            StockMin        = reader.GetInt32("stockMin"),
+            Quantity           = reader.GetInt32("stock"),
+            MinQuantity        = reader.GetInt32("stockMin"),
 
             WineFamily = new WineFamily()
             {
-                PkWineFamily = reader.GetInt32("fkWineFamily")
+                IDWineFamily = reader.GetInt32("fkWineFamily")
             },
             Supplier = new Supplier()
             {
-                PkSupplier = reader.GetInt32("fkSupplier")
+                IDSupplier = reader.GetInt32("fkSupplier")
             }
         };
         reader.Close();
 
-        if (!WineFamilyService.Get(product.WineFamily.PkWineFamily, out WineFamily? wineFamily))
+        if (!WineFamilyService.Get(product.WineFamily.IDWineFamily, out WineFamily? wineFamily))
             return false;
         if (wineFamily is null)
             return false;
         product.WineFamily = wineFamily;
 
-        if (!SupplierService.Get(product.Supplier.PkSupplier, out Supplier? supplier))
+        if (!SupplierService.Get(product.Supplier.IDSupplier, out Supplier? supplier))
             return false;
         if (supplier is null)
             return false;
@@ -118,7 +118,7 @@ public static class ProductService
         return true;
     }
 
-    public static bool Add(Product product)
+    public static bool Add(Article product)
     {
         string sql = "INSERT INTO `Product` (name, reference, price, tva, age, description, stock, stockMin, fkWineFamily, fkSupplier) " +
             "VALUES (@name, @reference, @price, @tva, @age, @description, @stock, @stockMin, @fkWineFamily, @fkSupplier)";
@@ -128,30 +128,30 @@ public static class ProductService
         command.Parameters.AddWithValue("@name",            product.Name);
         command.Parameters.AddWithValue("@reference",       product.Reference);
 
-        command.Parameters.AddWithValue("@price",           product.Price);
+        command.Parameters.AddWithValue("@price",           product.BuyingPrice);
         command.Parameters.AddWithValue("@tva",             product.TVA);
 
-        command.Parameters.AddWithValue("@age",             product.Age);
+        command.Parameters.AddWithValue("@age",             product.WineYear);
         command.Parameters.AddWithValue("@description",     product.Description);
 
-        command.Parameters.AddWithValue("@stock",           product.Stock);
-        command.Parameters.AddWithValue("@stockMin",        product.StockMin);
+        command.Parameters.AddWithValue("@stock",           product.Quantity);
+        command.Parameters.AddWithValue("@stockMin",        product.MinQuantity);
 
-        command.Parameters.AddWithValue("@fkWineFamily",    product.WineFamily.PkWineFamily);
-        command.Parameters.AddWithValue("@fkSupplier",      product.Supplier.PkSupplier);
+        command.Parameters.AddWithValue("@fkWineFamily",    product.WineFamily.IDWineFamily);
+        command.Parameters.AddWithValue("@fkSupplier",      product.Supplier.IDSupplier);
 
         if (!DBConnection.Execute(command))
             return false;
 
-        product.PkProduct = DBConnection.GetLastPk("Product");
+        product.IDArticle = DBConnection.GetLastPk("Product");
 
-        if (!WineFamilyService.Get(product.WineFamily.PkWineFamily, out WineFamily? wineFamily))
+        if (!WineFamilyService.Get(product.WineFamily.IDWineFamily, out WineFamily? wineFamily))
             return false;
         if (wineFamily is null)
             return false;
         product.WineFamily = wineFamily;
 
-        if (!SupplierService.Get(product.Supplier.PkSupplier, out Supplier? supplier))
+        if (!SupplierService.Get(product.Supplier.IDSupplier, out Supplier? supplier))
             return false;
         if (supplier is null)
             return false;
@@ -165,7 +165,7 @@ public static class ProductService
         return DBConnection.Delete("Product", id);
     }
 
-    public static bool Update(Product product)
+    public static bool Update(Article product)
     {
         string sql = $"UPDATE `Product`             " +
             $"SET                                   " +
@@ -179,24 +179,24 @@ public static class ProductService
             $"`stockMin`        = @stockMin,        " +
             $"`fkWineFamily`    = @fkWineFamily,    " +
             $"`fkSupplier`      = @fkSupplier       " +
-            $"WHERE `pkProduct` = {product.PkProduct}";
+            $"WHERE `pkProduct` = {product.IDArticle}";
 
         MySqlCommand command = new(sql);
 
         command.Parameters.AddWithValue("@name",            product.Name);
         command.Parameters.AddWithValue("@reference",       product.Reference);
 
-        command.Parameters.AddWithValue("@price",           product.Price);
+        command.Parameters.AddWithValue("@price",           product.BuyingPrice);
         command.Parameters.AddWithValue("@tva",             product.TVA);
 
-        command.Parameters.AddWithValue("@age",             product.Age);
+        command.Parameters.AddWithValue("@age",             product.WineYear);
         command.Parameters.AddWithValue("@description",     product.Description);
 
-        command.Parameters.AddWithValue("@stock",           product.Stock);
-        command.Parameters.AddWithValue("@stockMin",        product.StockMin);
+        command.Parameters.AddWithValue("@stock",           product.Quantity);
+        command.Parameters.AddWithValue("@stockMin",        product.MinQuantity);
 
-        command.Parameters.AddWithValue("@fkWineFamily",    product.WineFamily.PkWineFamily);
-        command.Parameters.AddWithValue("@fkSupplier",      product.Supplier.PkSupplier);
+        command.Parameters.AddWithValue("@fkWineFamily",    product.WineFamily.IDWineFamily);
+        command.Parameters.AddWithValue("@fkSupplier",      product.Supplier.IDSupplier);
 
         if (!DBConnection.Execute(command))
             return false;

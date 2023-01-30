@@ -35,13 +35,13 @@ public class SupplierCommandController : ControllerBase
         if (!SupplierCommandService.Add(supplierCommand))
             return StatusCode(500);
 
-        return CreatedAtAction(nameof(Create), new { pkSupplierCommand = supplierCommand.PkSupplierCommand }, supplierCommand);
+        return CreatedAtAction(nameof(Create), new { pkSupplierCommand = supplierCommand.IDSupplierCommand }, supplierCommand);
     }
 
     [HttpPut("{id}")]
     public IActionResult Update(int id, SupplierCommand supplierCommand)
     {
-        if (id != supplierCommand.PkSupplierCommand)
+        if (id != supplierCommand.IDSupplierCommand)
             return BadRequest();
 
         if (!SupplierCommandService.Get(id, out SupplierCommand? ExistingSupplierCommand))

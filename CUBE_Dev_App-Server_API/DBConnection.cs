@@ -15,10 +15,6 @@ public static class DBConnection
         if (!Open()) Console.Error.WriteLine("Failed Initial DB Connection!");
     }
 
-    /*public static void UptadeSettings(DBSettings dbSettings)
-    {
-    }*/
-
     /// <summary>
     /// Opens connection to database
     /// </summary>

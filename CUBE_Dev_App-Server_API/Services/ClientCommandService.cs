@@ -1,4 +1,5 @@
 ﻿using CUBE_Dev_App_Server_API.Models;
+using CUBE_Dev_App_Server_API.Models.Enums;
 using MySql.Data.MySqlClient;
 
 namespace CUBE_Dev_App_Server_API.Services;
@@ -19,10 +20,10 @@ public static class ClientCommandService
         {
             clientCommands.Add(new ClientCommand()
             {
-                PkClientCommand = reader.GetInt32("pkClientCommand"),
+                IDClientCommand = reader.GetInt32("pkClientCommand"),
 
                 CommandDate     = reader.GetDateTime("commandDate"),
-                CommandStatus   = (CommandStatus)reader.GetInt32("commandStatus"),
+                Status   = (CommandStatus)reader.GetInt32("commandStatus"),
 
                 Address         = reader.GetString("address"),
                 City            = reader.GetString("city"),
@@ -35,7 +36,7 @@ public static class ClientCommandService
 
                 Client = new Client()
                 {
-                    PkClient    = reader.GetInt32("fkClient")
+                    IDClient    = reader.GetInt32("fkClient")
                 }
             });
         }
@@ -63,10 +64,10 @@ public static class ClientCommandService
 
         clientCommand = new ClientCommand()
         {
-            PkClientCommand = reader.GetInt32("pkClientCommand"),
+            IDClientCommand = reader.GetInt32("pkClientCommand"),
 
             CommandDate     = reader.GetDateTime("commandDate"),
-            CommandStatus   = (CommandStatus)reader.GetInt32("commandStatus"),
+            Status   = (CommandStatus)reader.GetInt32("commandStatus"),
 
             Address         = reader.GetString("address"),
             City            = reader.GetString("city"),
@@ -79,7 +80,7 @@ public static class ClientCommandService
 
             Client = new Client()
             {
-                PkClient = reader.GetInt32("fkClient")
+                IDClient = reader.GetInt32("fkClient")
             }
         };
         reader.Close();
@@ -94,7 +95,7 @@ public static class ClientCommandService
         MySqlCommand command = new(sql);
 
         command.Parameters.AddWithValue("@commandDate",     clientCommand.CommandDate);
-        command.Parameters.AddWithValue("@commandStatus",   clientCommand.CommandStatus);
+        command.Parameters.AddWithValue("@commandStatus",   clientCommand.Status);
 
         command.Parameters.AddWithValue("@address",         clientCommand.Address);
         command.Parameters.AddWithValue("@city",            clientCommand.City);
@@ -105,12 +106,12 @@ public static class ClientCommandService
         command.Parameters.AddWithValue("@totalCost",       clientCommand.TotalCost);
         command.Parameters.AddWithValue("@transportCost",   clientCommand.TransportCost);
 
-        command.Parameters.AddWithValue("@fkClient",        clientCommand.Client.PkClient);
+        command.Parameters.AddWithValue("@fkClient",        clientCommand.Client.IDClient);
 
         if (!DBConnection.Execute(command))
             return false;
 
-        clientCommand.PkClientCommand = DBConnection.GetLastPk("ClientCommand");
+        clientCommand.IDClientCommand = DBConnection.GetLastPk("ClientCommand");
         return true;
     }
 
@@ -137,10 +138,10 @@ public static class ClientCommandService
 
         MySqlCommand command = new(sql);
 
-        command.Parameters.AddWithValue("@pkClientCommand", clientCommand.PkClientCommand);
+        command.Parameters.AddWithValue("@pkClientCommand", clientCommand.IDClientCommand);
 
         command.Parameters.AddWithValue("@commandDate",     clientCommand.CommandDate);
-        command.Parameters.AddWithValue("@commandStatus",   clientCommand.CommandStatus);
+        command.Parameters.AddWithValue("@commandStatus",   clientCommand.Status);
 
         command.Parameters.AddWithValue("@address",         clientCommand.Address);
         command.Parameters.AddWithValue("@city",            clientCommand.City);
@@ -151,7 +152,7 @@ public static class ClientCommandService
         command.Parameters.AddWithValue("@totalCost",       clientCommand.TotalCost);
         command.Parameters.AddWithValue("@transportCost",   clientCommand.TransportCost);
 
-        command.Parameters.AddWithValue("@fkClient",        clientCommand.Client.PkClient);
+        command.Parameters.AddWithValue("@fkClient",        clientCommand.Client.IDClient);
 
         if (!DBConnection.Execute(command))
             return false;

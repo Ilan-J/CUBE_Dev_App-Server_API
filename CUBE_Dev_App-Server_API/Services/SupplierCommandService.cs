@@ -1,4 +1,5 @@
 ﻿using CUBE_Dev_App_Server_API.Models;
+using CUBE_Dev_App_Server_API.Models.Enums;
 using MySql.Data.MySqlClient;
 
 namespace CUBE_Dev_App_Server_API.Services;
@@ -19,24 +20,24 @@ public static class SupplierCommandService
         {
             supplierCommands.Add(new SupplierCommand()
             {
-                PkSupplierCommand = reader.GetInt32("pkSupplierCommand"),
+                IDSupplierCommand = reader.GetInt32("pkSupplierCommand"),
 
                 CommandDate     = reader.GetDateTime("commandDate"),
                 CommandType     = (CommandType)reader.GetInt32("commandType"),
-                CommandStatus   = (CommandStatus)reader.GetInt32("commandStatus"),
+                Status   = (CommandStatus)reader.GetInt32("commandStatus"),
 
                 TotalCost = reader.GetFloat("totalCost"),
                 TransportCost = reader.GetFloat("transportCost"),
 
                 Supplier = new Supplier()
                 {
-                    PkSupplier  = reader.GetInt32("pkSupplier"),
+                    IDSupplier  = reader.GetInt32("pkSupplier"),
 
                     Name        = reader.GetString("name"),
                     Email       = reader.GetString("email"),
 
                     Address     = reader.GetString("address"),
-                    City        = reader.GetString("city"),
+                    Town        = reader.GetString("city"),
                     PostalCode  = reader.GetString("postalCode")
                 }
             });
@@ -63,24 +64,24 @@ public static class SupplierCommandService
 
         supplierCommand = new SupplierCommand()
         {
-            PkSupplierCommand = reader.GetInt32("pkSupplierCommand"),
+            IDSupplierCommand = reader.GetInt32("pkSupplierCommand"),
 
             CommandDate     = reader.GetDateTime("commandDate"),
             CommandType     = (CommandType)reader.GetInt32("commandType"),
-            CommandStatus   = (CommandStatus)reader.GetInt32("commandStatus"),
+            Status   = (CommandStatus)reader.GetInt32("commandStatus"),
 
             TotalCost       = reader.GetFloat("totalCost"),
             TransportCost   = reader.GetFloat("transportCost"),
 
             Supplier = new Supplier()
             {
-                PkSupplier  = reader.GetInt32("pkSupplier"),
+                IDSupplier  = reader.GetInt32("pkSupplier"),
 
                 Name        = reader.GetString("name"),
                 Email       = reader.GetString("email"),
 
                 Address     = reader.GetString("address"),
-                City        = reader.GetString("city"),
+                Town        = reader.GetString("city"),
                 PostalCode  = reader.GetString("postalCode")
             }
         };
@@ -100,12 +101,12 @@ public static class SupplierCommandService
         command.Parameters.AddWithValue("@commandDate",      supplierCommand.CommandDate);
         command.Parameters.AddWithValue("@totalCost",       supplierCommand.TotalCost);
         command.Parameters.AddWithValue("@transportCost",   supplierCommand.TransportCost);
-        command.Parameters.AddWithValue("@fkSupplier",      supplierCommand.Supplier.PkSupplier);
+        command.Parameters.AddWithValue("@fkSupplier",      supplierCommand.Supplier.IDSupplier);
 
         if (!DBConnection.Execute(command))
             return false;
 
-        supplierCommand.PkSupplierCommand = DBConnection.GetLastPk("SupplierCommand");
+        supplierCommand.IDSupplierCommand = DBConnection.GetLastPk("SupplierCommand");
         return true;
     }
 
@@ -118,14 +119,14 @@ public static class SupplierCommandService
     {
         string sql = $"UPDATE `SupplierCommand` " +
             $"SET `commandDate` = @commandDate, `totalCost` = @totalCost, `transportCost` = @transportCost, `fkSupplier` = @fkSupplier " +
-            $"WHERE `pkSupplierCommand` = {supplierCommand.PkSupplierCommand}";
+            $"WHERE `pkSupplierCommand` = {supplierCommand.IDSupplierCommand}";
 
         MySqlCommand command = new(sql);
 
         command.Parameters.AddWithValue("@commandDate",      supplierCommand.CommandDate);
         command.Parameters.AddWithValue("@totalCost",       supplierCommand.TotalCost);
         command.Parameters.AddWithValue("@transportCost",   supplierCommand.TransportCost);
-        command.Parameters.AddWithValue("@fkSupplier",      supplierCommand.Supplier.PkSupplier);
+        command.Parameters.AddWithValue("@fkSupplier",      supplierCommand.Supplier.IDSupplier);
 
         if (!DBConnection.Execute(command))
             return false;

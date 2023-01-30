@@ -19,14 +19,14 @@ public static class SupplierService
         {
             suppliers.Add(new Supplier()
             {
-                PkSupplier  = reader.GetInt32("pkSupplier"),
+                IDSupplier = reader.GetInt32("pkSupplier"),
 
-                Name        = reader.GetString("name"),
-                Email       = reader.GetString("email"),
+                Name = reader.GetString("name"),
+                Email = reader.GetString("email"),
 
-                Address     = reader.GetString("address"),
-                City        = reader.GetString("city"),
-                PostalCode  = reader.GetString("postalCode")
+                Address = reader.GetString("address"),
+                Town = reader.GetString("city"),
+                PostalCode = reader.GetString("postalCode")
             });
         }
         reader.Close();
@@ -52,14 +52,14 @@ public static class SupplierService
 
         supplier = new Supplier()
         {
-            PkSupplier  = reader.GetInt32("pkSupplier"),
+            IDSupplier = reader.GetInt32("pkSupplier"),
 
-            Name        = reader.GetString("name"),
-            Email       = reader.GetString("email"),
+            Name = reader.GetString("name"),
+            Email = reader.GetString("email"),
 
-            Address     = reader.GetString("address"),
-            City        = reader.GetString("city"),
-            PostalCode  = reader.GetString("postalCode")
+            Address = reader.GetString("address"),
+            Town = reader.GetString("city"),
+            PostalCode = reader.GetString("postalCode")
         };
         reader.Close();
         return true;
@@ -69,20 +69,20 @@ public static class SupplierService
     {
         string sql = "INSERT INTO `Supplier` (`name`, `email`, `address`, `city`, `postalCode`) " +
             "VALUES (@name, @email, @address, @city, @postalCode)";
-        
+
         MySqlCommand command = new(sql);
 
-        command.Parameters.AddWithValue("@name",        supplier.Name);
-        command.Parameters.AddWithValue("@email",       supplier.Email);
+        command.Parameters.AddWithValue("@name", supplier.Name);
+        command.Parameters.AddWithValue("@email", supplier.Email);
 
-        command.Parameters.AddWithValue("@address",     supplier.Address);
-        command.Parameters.AddWithValue("@city",        supplier.City);
-        command.Parameters.AddWithValue("@postalCode",  supplier.PostalCode);
+        command.Parameters.AddWithValue("@address", supplier.Address);
+        command.Parameters.AddWithValue("@city", supplier.Town);
+        command.Parameters.AddWithValue("@postalCode", supplier.PostalCode);
 
         if (!DBConnection.Execute(command))
             return false;
 
-        supplier.PkSupplier = DBConnection.GetLastPk("Supplier");
+        supplier.IDSupplier = DBConnection.GetLastPk("Supplier");
         return true;
     }
 
@@ -95,16 +95,16 @@ public static class SupplierService
     {
         string sql = $"UPDATE `Supplier` " +
             $"SET `name` = @name, `email` = @email, `address` = @address, `city` = @city, `postalCode` = @postalCode " +
-            $"WHERE `pkSupplier` = {supplier.PkSupplier}";
-        
+            $"WHERE `pkSupplier` = {supplier.IDSupplier}";
+
         MySqlCommand command = new(sql);
 
-        command.Parameters.AddWithValue("@name",        supplier.Name);
-        command.Parameters.AddWithValue("@email",       supplier.Email);
+        command.Parameters.AddWithValue("@name", supplier.Name);
+        command.Parameters.AddWithValue("@email", supplier.Email);
 
-        command.Parameters.AddWithValue("@address",     supplier.Address);
-        command.Parameters.AddWithValue("@city",        supplier.City);
-        command.Parameters.AddWithValue("@postalCode",  supplier.PostalCode);
+        command.Parameters.AddWithValue("@address", supplier.Address);
+        command.Parameters.AddWithValue("@city", supplier.Town);
+        command.Parameters.AddWithValue("@postalCode", supplier.PostalCode);
 
         if (!DBConnection.Execute(command))
             return false;

@@ -19,7 +19,7 @@ public static class WineFamilyService
         {
             wineFamilies.Add(new WineFamily()
             {
-                PkWineFamily    = reader.GetInt32("pkWineFamily"),
+                IDWineFamily    = reader.GetInt32("pkWineFamily"),
                 Name            = reader.GetString("name")
             });
         }
@@ -46,7 +46,7 @@ public static class WineFamilyService
 
         wineFamily = new WineFamily()
         {
-            PkWineFamily    = reader.GetInt32("pkWineFamily"),
+            IDWineFamily    = reader.GetInt32("pkWineFamily"),
             Name            = reader.GetString("name")
         };
         reader.Close();
@@ -65,7 +65,7 @@ public static class WineFamilyService
         if (!DBConnection.Execute(command))
             return false;
 
-        wineFamily.PkWineFamily = DBConnection.GetLastPk("WineFamily");
+        wineFamily.IDWineFamily = DBConnection.GetLastPk("WineFamily");
         return true;
     }
 
@@ -78,7 +78,7 @@ public static class WineFamilyService
     {
         string sql = $"UPDATE `WineFamily` " +
             $"SET `name` = @name " +
-            $"WHERE `pkWineFamily` = {wineFamily.PkWineFamily}";
+            $"WHERE `pkWineFamily` = {wineFamily.IDWineFamily}";
 
         MySqlCommand command = new(sql);
 
