@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `negosud` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `negosud`;
 -- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
 --
 -- Host: localhost    Database: negosud
@@ -18,10 +20,6 @@
 --
 -- Table structure for table `article`
 --
-
-DROP SCHEMA IF EXISTS negosud;
-CREATE SCHEMA negosud;
-USE negosud;
 
 DROP TABLE IF EXISTS `article`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -142,6 +140,78 @@ LOCK TABLES `clientcommandlist` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `commandstatus`
+--
+
+DROP TABLE IF EXISTS `commandstatus`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `commandstatus` (
+  `IDCommandStatus` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(45) NOT NULL,
+  PRIMARY KEY (`IDCommandStatus`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `commandstatus`
+--
+
+LOCK TABLES `commandstatus` WRITE;
+/*!40000 ALTER TABLE `commandstatus` DISABLE KEYS */;
+INSERT INTO `commandstatus` VALUES (1,'CLOS'),(2,'EN COURS');
+/*!40000 ALTER TABLE `commandstatus` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `commandtype`
+--
+
+DROP TABLE IF EXISTS `commandtype`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `commandtype` (
+  `IDCommandType` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(45) NOT NULL,
+  PRIMARY KEY (`IDCommandType`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `commandtype`
+--
+
+LOCK TABLES `commandtype` WRITE;
+/*!40000 ALTER TABLE `commandtype` DISABLE KEYS */;
+INSERT INTO `commandtype` VALUES (1,'MANUELLE'),(2,'AUTOMATIQUE');
+/*!40000 ALTER TABLE `commandtype` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `datautils`
+--
+
+DROP TABLE IF EXISTS `datautils`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `datautils` (
+  `Key` varchar(100) NOT NULL,
+  `Value` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`Key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `datautils`
+--
+
+LOCK TABLES `datautils` WRITE;
+/*!40000 ALTER TABLE `datautils` DISABLE KEYS */;
+INSERT INTO `datautils` VALUES ('defaultmargin','30,0'),('defaulttva','20'),('password',''),('username','negosud');
+/*!40000 ALTER TABLE `datautils` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `supplier`
 --
 
@@ -258,4 +328,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-30 22:17:40
+-- Dump completed on 2023-01-31 21:15:08
