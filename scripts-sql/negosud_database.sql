@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS `article`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `article` (
   `IDArticle` int NOT NULL AUTO_INCREMENT,
-  `Reference` varchar(50) DEFAULT NULL,
+  `Reference` varchar(256) DEFAULT NULL,
   `Name` varchar(256) NOT NULL,
   `WineYear` int NOT NULL,
   `Quantity` int NOT NULL,
@@ -67,11 +67,11 @@ CREATE TABLE `client` (
   `Firstname` varchar(256) NOT NULL,
   `Lastname` varchar(256) NOT NULL,
   `Address` varchar(256) NOT NULL,
-  `PostalCode` varchar(5) NOT NULL,
+  `PostalCode` varchar(40) NOT NULL,
   `Town` varchar(256) NOT NULL,
+  `Country` varchar(256) NOT NULL,
   `Email` varchar(256) NOT NULL,
   `Password` varchar(256) NOT NULL,
-  `Country` varchar(45) NOT NULL,
   PRIMARY KEY (`IDClient`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -95,11 +95,13 @@ DROP TABLE IF EXISTS `clientcommand`;
 CREATE TABLE `clientcommand` (
   `IDClientCommand` int NOT NULL AUTO_INCREMENT,
   `CommandDate` datetime NOT NULL,
-  `Status` varchar(100) NOT NULL,
   `IDClient` int NOT NULL,
+  `IDCommandStatus` int NOT NULL,
   PRIMARY KEY (`IDClientCommand`),
   KEY `IDClient` (`IDClient`),
-  CONSTRAINT `clientcommand_ibfk_1` FOREIGN KEY (`IDClient`) REFERENCES `client` (`IDClient`)
+  KEY `IDCommandStatus` (`IDCommandStatus`),
+  CONSTRAINT `clientcommand_ibfk_1` FOREIGN KEY (`IDClient`) REFERENCES `client` (`IDClient`),
+  CONSTRAINT `clientcommand_ibfk_2` FOREIGN KEY (`IDCommandStatus`) REFERENCES `commandstatus` (`IDCommandStatus`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -148,7 +150,7 @@ DROP TABLE IF EXISTS `commandstatus`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `commandstatus` (
   `IDCommandStatus` int NOT NULL AUTO_INCREMENT,
-  `Name` varchar(45) NOT NULL,
+  `Name` varchar(50) NOT NULL,
   PRIMARY KEY (`IDCommandStatus`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -172,7 +174,7 @@ DROP TABLE IF EXISTS `commandtype`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `commandtype` (
   `IDCommandType` int NOT NULL AUTO_INCREMENT,
-  `Name` varchar(45) NOT NULL,
+  `Name` varchar(50) NOT NULL,
   PRIMARY KEY (`IDCommandType`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -183,7 +185,7 @@ CREATE TABLE `commandtype` (
 
 LOCK TABLES `commandtype` WRITE;
 /*!40000 ALTER TABLE `commandtype` DISABLE KEYS */;
-INSERT INTO `commandtype` VALUES (1,'MANUELLE'),(2,'AUTOMATIQUE');
+INSERT INTO `commandtype` VALUES (1,'MANUEL'),(2,'AUTOMATIQUE');
 /*!40000 ALTER TABLE `commandtype` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -195,9 +197,9 @@ DROP TABLE IF EXISTS `datautils`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `datautils` (
-  `Key` varchar(100) NOT NULL,
-  `Value` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`Key`)
+  `DataKey` varchar(256) NOT NULL,
+  `DataValue` varchar(256) DEFAULT NULL,
+  PRIMARY KEY (`DataKey`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -222,8 +224,9 @@ CREATE TABLE `supplier` (
   `IDSupplier` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(256) NOT NULL,
   `Address` varchar(256) NOT NULL,
-  `PostalCode` varchar(5) NOT NULL,
+  `PostalCode` varchar(40) NOT NULL,
   `Town` varchar(256) NOT NULL,
+  `Country` varchar(256) NOT NULL,
   `Email` varchar(256) NOT NULL,
   PRIMARY KEY (`IDSupplier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -246,16 +249,20 @@ DROP TABLE IF EXISTS `suppliercommand`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `suppliercommand` (
-  `IDSupplierCommand` int NOT NULL AUTO_INCREMENT,
+  `IDSupplierCommand` varchar(10) NOT NULL,
   `TransportCost` decimal(15,2) NOT NULL,
   `CommandDate` datetime NOT NULL,
-  `CommandType` char(1) NOT NULL,
-  `Status` varchar(50) NOT NULL,
-  `IDSupplier` int NOT NULL,
   `TotalCost` decimal(15,2) NOT NULL,
+  `IDSupplier` int NOT NULL,
+  `IDCommandStatus` int NOT NULL,
+  `IDCommandType` int NOT NULL,
   PRIMARY KEY (`IDSupplierCommand`),
   KEY `IDSupplier` (`IDSupplier`),
-  CONSTRAINT `suppliercommand_ibfk_1` FOREIGN KEY (`IDSupplier`) REFERENCES `supplier` (`IDSupplier`)
+  KEY `IDCommandStatus` (`IDCommandStatus`),
+  KEY `IDCommandType` (`IDCommandType`),
+  CONSTRAINT `suppliercommand_ibfk_1` FOREIGN KEY (`IDSupplier`) REFERENCES `supplier` (`IDSupplier`),
+  CONSTRAINT `suppliercommand_ibfk_2` FOREIGN KEY (`IDCommandStatus`) REFERENCES `commandstatus` (`IDCommandStatus`),
+  CONSTRAINT `suppliercommand_ibfk_3` FOREIGN KEY (`IDCommandType`) REFERENCES `commandtype` (`IDCommandType`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -277,7 +284,7 @@ DROP TABLE IF EXISTS `suppliercommandlist`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `suppliercommandlist` (
   `IDArticle` int NOT NULL,
-  `IDSupplierCommand` int NOT NULL,
+  `IDSupplierCommand` varchar(10) NOT NULL,
   `Quantity` int NOT NULL,
   PRIMARY KEY (`IDArticle`,`IDSupplierCommand`),
   KEY `IDSupplierCommand` (`IDSupplierCommand`),
@@ -307,7 +314,7 @@ CREATE TABLE `winefamily` (
   `Name` varchar(50) NOT NULL,
   PRIMARY KEY (`IDWineFamily`),
   UNIQUE KEY `Name` (`Name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -316,6 +323,7 @@ CREATE TABLE `winefamily` (
 
 LOCK TABLES `winefamily` WRITE;
 /*!40000 ALTER TABLE `winefamily` DISABLE KEYS */;
+INSERT INTO `winefamily` VALUES (4,'Armagnac'),(2,'Blanc'),(3,'Rosé'),(1,'Rouge');
 /*!40000 ALTER TABLE `winefamily` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -328,4 +336,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-31 21:15:08
+-- Dump completed on 2023-02-01 21:12:14
