@@ -29,13 +29,19 @@ CREATE TABLE `article` (
   `Reference` varchar(256) DEFAULT NULL,
   `Name` varchar(256) NOT NULL,
   `WineYear` int NOT NULL,
-  `Quantity` int NOT NULL,
-  `MinQuantity` int NOT NULL,
-  `BuyingPrice` decimal(15,2) NOT NULL,
-  `PriceTTC` decimal(15,2) NOT NULL,
+  `UnitPriceTTC` decimal(15,2) NOT NULL,
+  `BoxPriceTTC` decimal(15,2) NOT NULL,
+  `BoxBuyingPrice` decimal(15,2) NOT NULL,
   `TVA` decimal(15,2) NOT NULL,
   `Description` text,
   `ImageLink` varchar(1000) DEFAULT NULL,
+  `BoxStockQuantity` int NOT NULL,
+  `UnitStockQuantity` int NOT NULL,
+  `BoxVirtualQuantity` int NOT NULL,
+  `UnitVirtualQuantity` int NOT NULL,
+  `BoxMinQuantity` int NOT NULL,
+  `BoxOptimalQuantity` int NOT NULL,
+  `BottleQuantityPerBox` int NOT NULL,
   `IDSupplier` int NOT NULL,
   `IDWineFamily` int NOT NULL,
   PRIMARY KEY (`IDArticle`),
@@ -43,7 +49,7 @@ CREATE TABLE `article` (
   KEY `IDWineFamily` (`IDWineFamily`),
   CONSTRAINT `article_ibfk_1` FOREIGN KEY (`IDSupplier`) REFERENCES `supplier` (`IDSupplier`),
   CONSTRAINT `article_ibfk_2` FOREIGN KEY (`IDWineFamily`) REFERENCES `winefamily` (`IDWineFamily`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -52,6 +58,7 @@ CREATE TABLE `article` (
 
 LOCK TABLES `article` WRITE;
 /*!40000 ALTER TABLE `article` DISABLE KEYS */;
+INSERT INTO `article` VALUES (1,'TAR_FT01_2021','Classic',2021,8.00,40.00,25.50,20.00,'Chaque gorgée dégustée est une véritable explosion de fruits (d\'agrumes), accompagnée d\'une agréable fraîcheur qui fera appel à une nouvelle gorgée. Le conseil de nos sommeliers : avoir toujours une bouteille au frais... au cas où !','http://www.tariquet.com/images-vins/produits/normal/ugniblanc-g.jpg',-50,0,78,4,10,50,6,1,2);
 /*!40000 ALTER TABLE `article` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -73,7 +80,7 @@ CREATE TABLE `client` (
   `Email` varchar(256) NOT NULL,
   `Password` varchar(256) NOT NULL,
   PRIMARY KEY (`IDClient`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -82,6 +89,7 @@ CREATE TABLE `client` (
 
 LOCK TABLES `client` WRITE;
 /*!40000 ALTER TABLE `client` DISABLE KEYS */;
+INSERT INTO `client` VALUES (1,'Michel','Dupont','45 Rue des Pommiers','75000','Paris','France','michel.dupont@gmail.com','1234'),(2,'Catherine','Dupont','45 Rue des Poiriers','29200','Brest','France','catherine.dupont@gmail.com','');
 /*!40000 ALTER TABLE `client` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -95,8 +103,10 @@ DROP TABLE IF EXISTS `clientcommand`;
 CREATE TABLE `clientcommand` (
   `IDClientCommand` int NOT NULL AUTO_INCREMENT,
   `CommandDate` datetime NOT NULL,
+  `TotalCostTTC` decimal(15,2) NOT NULL,
   `IDClient` int NOT NULL,
   `IDCommandStatus` int NOT NULL,
+  `TotalCostHT` decimal(15,2) NOT NULL,
   PRIMARY KEY (`IDClientCommand`),
   KEY `IDClient` (`IDClient`),
   KEY `IDCommandStatus` (`IDCommandStatus`),
@@ -125,10 +135,11 @@ CREATE TABLE `clientcommandlist` (
   `IDArticle` int NOT NULL,
   `IDClientCommand` int NOT NULL,
   `Quantity` int NOT NULL,
+  `IDQuantityType` int NOT NULL,
   PRIMARY KEY (`IDArticle`,`IDClientCommand`),
   KEY `IDClientCommand` (`IDClientCommand`),
   CONSTRAINT `clientcommandlist_ibfk_1` FOREIGN KEY (`IDArticle`) REFERENCES `article` (`IDArticle`),
-  CONSTRAINT `clientcommandlist_ibfk_2` FOREIGN KEY (`IDClientCommand`) REFERENCES `clientcommand` (`IDClientCommand`)
+  CONSTRAINT `clientcommandlist_ibfk_2` FOREIGN KEY (`IDClientCommand`) REFERENCES `clientcommand` (`IDClientCommand`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -209,8 +220,32 @@ CREATE TABLE `datautils` (
 
 LOCK TABLES `datautils` WRITE;
 /*!40000 ALTER TABLE `datautils` DISABLE KEYS */;
-INSERT INTO `datautils` VALUES ('defaultmargin','30,0'),('defaulttva','20'),('password',''),('username','negosud');
+INSERT INTO `datautils` VALUES ('defaultmargin','30'),('defaulttva','20'),('password',NULL),('username',NULL);
 /*!40000 ALTER TABLE `datautils` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `quantitytype`
+--
+
+DROP TABLE IF EXISTS `quantitytype`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `quantitytype` (
+  `IDQuantityType` int NOT NULL AUTO_INCREMENT,
+  `Name` varchar(50) NOT NULL,
+  PRIMARY KEY (`IDQuantityType`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `quantitytype`
+--
+
+LOCK TABLES `quantitytype` WRITE;
+/*!40000 ALTER TABLE `quantitytype` DISABLE KEYS */;
+INSERT INTO `quantitytype` VALUES (1,'UNITE'),(2,'CARTON');
+/*!40000 ALTER TABLE `quantitytype` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -229,7 +264,7 @@ CREATE TABLE `supplier` (
   `Country` varchar(256) NOT NULL,
   `Email` varchar(256) NOT NULL,
   PRIMARY KEY (`IDSupplier`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -238,6 +273,7 @@ CREATE TABLE `supplier` (
 
 LOCK TABLES `supplier` WRITE;
 /*!40000 ALTER TABLE `supplier` DISABLE KEYS */;
+INSERT INTO `supplier` VALUES (1,'Tariquet','Château du Tariquet','32800','Eauze','France','contact@domaine-tariquet.fr'),(2,'Pellehaut','Pellehaut','32250','Montréal','France','domaine-pellehot@gmail.com');
 /*!40000 ALTER TABLE `supplier` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -249,7 +285,7 @@ DROP TABLE IF EXISTS `suppliercommand`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `suppliercommand` (
-  `IDSupplierCommand` varchar(10) NOT NULL,
+  `IDSupplierCommand` int NOT NULL AUTO_INCREMENT,
   `TransportCost` decimal(15,2) NOT NULL,
   `CommandDate` datetime NOT NULL,
   `TotalCost` decimal(15,2) NOT NULL,
@@ -284,12 +320,12 @@ DROP TABLE IF EXISTS `suppliercommandlist`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `suppliercommandlist` (
   `IDArticle` int NOT NULL,
-  `IDSupplierCommand` varchar(10) NOT NULL,
+  `IDSupplierCommand` int NOT NULL,
   `Quantity` int NOT NULL,
   PRIMARY KEY (`IDArticle`,`IDSupplierCommand`),
   KEY `IDSupplierCommand` (`IDSupplierCommand`),
   CONSTRAINT `suppliercommandlist_ibfk_1` FOREIGN KEY (`IDArticle`) REFERENCES `article` (`IDArticle`),
-  CONSTRAINT `suppliercommandlist_ibfk_2` FOREIGN KEY (`IDSupplierCommand`) REFERENCES `suppliercommand` (`IDSupplierCommand`)
+  CONSTRAINT `suppliercommandlist_ibfk_2` FOREIGN KEY (`IDSupplierCommand`) REFERENCES `suppliercommand` (`IDSupplierCommand`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -314,7 +350,7 @@ CREATE TABLE `winefamily` (
   `Name` varchar(50) NOT NULL,
   PRIMARY KEY (`IDWineFamily`),
   UNIQUE KEY `Name` (`Name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -323,7 +359,7 @@ CREATE TABLE `winefamily` (
 
 LOCK TABLES `winefamily` WRITE;
 /*!40000 ALTER TABLE `winefamily` DISABLE KEYS */;
-INSERT INTO `winefamily` VALUES (4,'Armagnac'),(2,'Blanc'),(3,'Rosé'),(1,'Rouge');
+INSERT INTO `winefamily` VALUES (2,'Blanc'),(5,'Digestif'),(4,'Pétillant'),(3,'Rosé'),(1,'Rouge');
 /*!40000 ALTER TABLE `winefamily` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -336,4 +372,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-01 21:12:14
+-- Dump completed on 2023-02-13 12:20:14
