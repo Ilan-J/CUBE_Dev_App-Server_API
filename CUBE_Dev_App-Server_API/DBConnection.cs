@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Google.Protobuf.WellKnownTypes;
+using MySql.Data.MySqlClient;
 
 namespace CUBE_Dev_App_Server_API;
 
@@ -8,11 +9,13 @@ public static class DBConnection
 
     static DBConnection()
     {
-        DBSettings dbSettings = Settings.GetDBSettings();
+        DBSettings dbSettings = new DBSettings();
+        dbSettings.GetJsonFileData();
 
         Connection = new MySqlConnection(dbSettings.ToString());
 
-        if (!Open()) Console.Error.WriteLine("Failed Initial DB Connection!");
+        if (!Open())
+            Console.Error.WriteLine("Failed Initial DB Connection !");
     }
 
     /// <summary>
@@ -41,10 +44,10 @@ public static class DBConnection
     }
 
     /// <summary>
-    /// 
+    /// Execute the "Select" query in the database
     /// </summary>
     /// <param name="sql"></param>
-    /// <returns>MySqlDataReader</returns>
+    /// <returns>The query result as a MySqlDataReader</returns>
     public static MySqlDataReader? ExecuteReader(string sql)
     {
         if (!Connection.Ping() && !Open())
@@ -61,23 +64,13 @@ public static class DBConnection
             return null;
         }
     }
-    public static bool Execute(string sql)
-    {
-        if (!Connection.Ping() && !Open())
-            return false;
 
-        try
-        {
-            new MySqlCommand(sql, Connection).ExecuteNonQuery();
-        }
-        catch (MySqlException ex)
-        {
-            Console.WriteLine(ex.Message);
-            return false;
-        }
-        return true;
-    }
-    public static bool Execute(MySqlCommand mySqlCommand)
+    /// <summary>
+    /// Execute the SQL command in the database
+    /// </summary>
+    /// <param name="mySqlCommand"></param>
+    /// <returns>True if the command was successful, otherwise false.</returns>
+    public static bool ExecuteCommandToDB(MySqlCommand mySqlCommand)
     {
         mySqlCommand.Connection = Connection;
         try
@@ -92,24 +85,36 @@ public static class DBConnection
         return true;
     }
 
-    public static bool Delete(string table, int id)
+    #region Global Requests
+
+    /// <summary>
+    /// Gets the highest primary key of a table
+    /// </summary>
+    /// <param name="tableName"></param>
+    /// <returns></returns>
+    public static int GetHighestPrimaryKey(string tableName)
     {
-        string sql = $"DELETE FROM `{table}` WHERE `pk{table}` = {id}";
-
-        return Execute(sql);
+        return GetHighestPrimaryKey(tableName, "ID" + tableName);
     }
-    
-    public static int GetLastPk(string table)
+
+    /// <summary>
+    /// Gets the highest primary key of a tableName
+    /// </summary>
+    /// <param name="tableName"></param>
+    /// <param name="idField"></param>
+    /// <returns></returns>
+    public static int GetHighestPrimaryKey(string tableName, string idField)
     {
-        string sql = $"SELECT MAX(`pk{table}`) FROM `{table}`";
+        string sql = $"SELECT MAX({idField}) FROM {tableName}";
 
-        MySqlDataReader? reader = ExecuteReader(sql);
-        if (reader is null || !reader.Read())
-            return 0;
+        using MySqlDataReader? reader = ExecuteReader(sql);
+        if (reader == null || !reader.Read())
+            return -1;
 
-        int pk = reader.GetInt32(0);
+        int primaryKey = reader.GetInt32(0);
 
-        reader.Close();
-        return pk;
-    }
+        return primaryKey;
+    } 
+
+    #endregion
 }

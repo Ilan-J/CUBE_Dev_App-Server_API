@@ -5,110 +5,142 @@ namespace CUBE_Dev_App_Server_API.Services;
 
 public static class SupplierService
 {
-    public static bool GetAll(out List<Supplier> suppliers)
+    public static bool GetAll(out List<Supplier>? suppliers)
     {
-        string sql = "SELECT * FROM `Supplier`";
+        string sql = @"SELECT * FROM Supplier ORDER BY IDSupplier";
+
+        using MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
+
+        if (reader == null)
+        {
+            suppliers = null;
+            return false;
+        }
 
         suppliers = new List<Supplier>();
 
-        MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
-        if (reader is null)
-            return false;
-
         while (reader.Read())
         {
-            suppliers.Add(new Supplier()
+            suppliers.Add(new Supplier
             {
-                IDSupplier = reader.GetInt32("pkSupplier"),
-
-                Name = reader.GetString("name"),
-                Email = reader.GetString("email"),
-
-                Address = reader.GetString("address"),
-                Town = reader.GetString("city"),
-                PostalCode = reader.GetString("postalCode")
+                IDSupplier = reader.GetInt32("IDSupplier"),
+                Name = reader.GetString("Name"),
+                Address = reader.GetString("Address"),
+                PostalCode = reader.GetString("PostalCode"),
+                Town = reader.GetString("Town"),
+                Country = reader.GetString("Country"),
+                Email = reader.GetString("Email")
             });
         }
-        reader.Close();
+
         return true;
     }
 
     public static bool Get(int id, out Supplier? supplier)
     {
-        string sql = $"SELECT * FROM `Supplier` WHERE `pkSupplier` = {id}";
+        string sql = $"SELECT * FROM Supplier WHERE IDSupplier = {id}";
 
-        MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
-        if (reader is null)
+        using MySqlCommand cmd = new MySqlCommand(sql, DBConnection.Connection);
+        cmd.Parameters.AddWithValue("@id", id);
+
+        using MySqlDataReader? reader = cmd.ExecuteReader();
+
+        if (reader == null)
         {
             supplier = null;
             return false;
         }
 
-        if (!reader.Read())
+        supplier = new Supplier();
+
+        if (reader.Read())
+        {
+            supplier = new Supplier
+            {
+                IDSupplier = reader.GetInt32("IDSupplier"),
+                Name = reader.GetString("Name"),
+                Address = reader.GetString("Address"),
+                PostalCode = reader.GetString("PostalCode"),
+                Town = reader.GetString("Town"),
+                Country = reader.GetString("Country"),
+                Email = reader.GetString("Email")
+            };
+        }
+        else
         {
             supplier = null;
+        }
+
+        return true;
+    }
+
+    public static bool GetAllNames(out List<SupplierName>? suppliersNames)
+    {
+        string sql = @"SELECT * FROM Supplier";
+
+        using MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
+
+        if (reader == null)
+        {
+            suppliersNames = null;
             return false;
         }
 
-        supplier = new Supplier()
+        suppliersNames = new List<SupplierName>();
+
+        while (reader.Read())
         {
-            IDSupplier = reader.GetInt32("pkSupplier"),
+            suppliersNames.Add(new SupplierName
+            {
+                IDSupplier = reader.GetInt32("IDSupplier"),
+                Name = reader.GetString("Name")
+            });
+        }
 
-            Name = reader.GetString("name"),
-            Email = reader.GetString("email"),
-
-            Address = reader.GetString("address"),
-            Town = reader.GetString("city"),
-            PostalCode = reader.GetString("postalCode")
-        };
-        reader.Close();
         return true;
     }
 
     public static bool Add(Supplier supplier)
     {
-        string sql = "INSERT INTO `Supplier` (`name`, `email`, `address`, `city`, `postalCode`) " +
-            "VALUES (@name, @email, @address, @city, @postalCode)";
+        string sql = "INSERT INTO Supplier " +
+            "(Name, Address, PostalCode, Town, Country, Email)" +
+            "VALUES (@Name, @Address, @PostalCode, @Town, @Country, @Email)";
 
-        MySqlCommand command = new(sql);
+        using (MySqlCommand command = new MySqlCommand(sql))
+        {
+            command.Parameters.AddWithValue("@Name", supplier.Name);
+            command.Parameters.AddWithValue("@Address", supplier.Address);
+            command.Parameters.AddWithValue("@PostalCode", supplier.PostalCode);
+            command.Parameters.AddWithValue("@Town", supplier.Town);
+            command.Parameters.AddWithValue("@Country", supplier.Country);
+            command.Parameters.AddWithValue("@Email", supplier.Email);
 
-        command.Parameters.AddWithValue("@name", supplier.Name);
-        command.Parameters.AddWithValue("@email", supplier.Email);
-
-        command.Parameters.AddWithValue("@address", supplier.Address);
-        command.Parameters.AddWithValue("@city", supplier.Town);
-        command.Parameters.AddWithValue("@postalCode", supplier.PostalCode);
-
-        if (!DBConnection.Execute(command))
-            return false;
-
-        supplier.IDSupplier = DBConnection.GetLastPk("Supplier");
-        return true;
-    }
-
-    public static bool Delete(int id)
-    {
-        return DBConnection.Delete("Supplier", id);
+            return DBConnection.ExecuteCommandToDB(command);
+        }
     }
 
     public static bool Update(Supplier supplier)
     {
-        string sql = $"UPDATE `Supplier` " +
-            $"SET `name` = @name, `email` = @email, `address` = @address, `city` = @city, `postalCode` = @postalCode " +
-            $"WHERE `pkSupplier` = {supplier.IDSupplier}";
+        string sql = @"UPDATE Supplier SET 
+                        Name = @Name, 
+                        Address = @Address, 
+                        PostalCode = @PostalCode, 
+                        Town = @Town, 
+                        Country = @Country, 
+                        Email = @Email
+                        WHERE IDSupplier = @IDSupplier";
 
-        MySqlCommand command = new(sql);
+        using (MySqlCommand command = new MySqlCommand(sql))
+        {
+            command.Parameters.AddWithValue("@Name", supplier.Name);
+            command.Parameters.AddWithValue("@Address", supplier.Address);
+            command.Parameters.AddWithValue("@PostalCode", supplier.PostalCode);
+            command.Parameters.AddWithValue("@Town", supplier.Town);
+            command.Parameters.AddWithValue("@Country", supplier.Country);
+            command.Parameters.AddWithValue("@Email", supplier.Email);
+            command.Parameters.AddWithValue("@IDSupplier", supplier.IDSupplier);
 
-        command.Parameters.AddWithValue("@name", supplier.Name);
-        command.Parameters.AddWithValue("@email", supplier.Email);
-
-        command.Parameters.AddWithValue("@address", supplier.Address);
-        command.Parameters.AddWithValue("@city", supplier.Town);
-        command.Parameters.AddWithValue("@postalCode", supplier.PostalCode);
-
-        if (!DBConnection.Execute(command))
-            return false;
-
-        return true;
+            return DBConnection.ExecuteCommandToDB(command);
+        }
     }
 }

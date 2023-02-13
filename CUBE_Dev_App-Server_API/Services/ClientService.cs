@@ -5,139 +5,127 @@ namespace CUBE_Dev_App_Server_API.Services;
 
 public static class ClientService
 {
-    public static bool GetAll(out List<Client> clients)
+    public static bool GetAll(out List<Client_DTO>? clients)
     {
-        string sql = "SELECT * FROM `Client`";
+        string sql = @"SELECT * FROM Client";
 
-        clients = new List<Client>();
+        using MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
 
-        MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
-        if (reader is null)
+        if (reader == null)
+        {
+            clients = null;
             return false;
+        }
+
+        clients = new List<Client_DTO>();
 
         while (reader.Read())
         {
-            clients.Add(new Client()
+            clients.Add(new Client_DTO
             {
-                IDClient    = reader.GetInt32("pkClient"),
-
-                Email       = reader.GetString("email"),
-                Password    = reader.GetString("password"),
-
-                Firstname   = reader.GetString("firstname"),
-                Lastname    = reader.GetString("lastname"),
-
-                Address     = reader.GetString("address"),
-                Town        = reader.GetString("city"),
-                Region      = reader.GetString("region"),
-                PostalCode  = reader.GetString("postalCode"),
-                Country     = reader.GetString("country")
+                IDClient = reader.GetInt32("IDClient"),
+                Firstname = reader.GetString("Firstname"),
+                Lastname = reader.GetString("Lastname"),
+                Address = reader.GetString("Address"),
+                PostalCode = reader.GetString("PostalCode"),
+                Town = reader.GetString("Town"),
+                Country = reader.GetString("Country"),
+                Email = reader.GetString("Email")
             });
         }
-        reader.Close();
+
         return true;
+
     }
 
-    public static bool Get(int id, out Client? client)
+    public static bool Get(int id, out Client_DTO? client)
     {
-        string sql = $"SELECT * FROM `Client` WHERE `pkClient` = {id}";
+        string sql = $"SELECT * FROM Client WHERE IDClient = {id}";
 
-        MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
-        if (reader is null)
+        using MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
+
+        if (reader == null)
         {
             client = null;
             return false;
         }
-        if (!reader.Read())
+
+        if (reader.Read())
         {
-            reader.Close();
+            client = new Client_DTO
+            {
+                IDClient = reader.GetInt32("IDClient"),
+                Firstname = reader.GetString("Firstname"),
+                Lastname = reader.GetString("Lastname"),
+                Address = reader.GetString("Address"),
+                PostalCode = reader.GetString("PostalCode"),
+                Town = reader.GetString("Town"),
+                Country = reader.GetString("Country"),
+                Email = reader.GetString("Email")
+            };
+        }
+        else
+        {
             client = null;
-            return false;
         }
 
-        client = new Client()
-        {
-            IDClient    = reader.GetInt32("pkClient"),
-
-            Email       = reader.GetString("email"),
-            Password    = reader.GetString("password"),
-
-            Firstname   = reader.GetString("firstname"),
-            Lastname    = reader.GetString("lastname"),
-
-            Address     = reader.GetString("address"),
-            Town        = reader.GetString("city"),
-            Region      = reader.GetString("region"),
-            PostalCode  = reader.GetString("postalCode"),
-            Country     = reader.GetString("country")
-        };
-        reader.Close();
         return true;
     }
 
     public static bool Add(Client client)
     {
-        string sql = "INSERT INTO `Client` (email, password, firstname, lastname, address, city, region, postalCode, country) " +
-            "VALUES (@email, @password, @firstname, @lastname, @address, @city, @region, @postalCode, @country)";
+        string sql = "INSERT INTO Client " +
+            "(Firstname, Lastname, Address, PostalCode, Town, Country, Email, Password)" +
+            "VALUES (@Firstname, @Lastname, @Address, @PostalCode, @Town, @Country, @Email, @Password)";
 
-        MySqlCommand command = new(sql);
+        using MySqlCommand command = new MySqlCommand(sql);
 
-        command.Parameters.AddWithValue("@email",       client.Email);
-        command.Parameters.AddWithValue("@password",    client.Password);
+        command.Parameters.AddWithValue("@Firstname", client.Firstname);
+        command.Parameters.AddWithValue("@Lastname", client.Lastname);
+        command.Parameters.AddWithValue("@Address", client.Address);
+        command.Parameters.AddWithValue("@PostalCode", client.PostalCode);
+        command.Parameters.AddWithValue("@Town", client.Town);
+        command.Parameters.AddWithValue("@Country", client.Country);
+        command.Parameters.AddWithValue("@Email", client.Email);
+        command.Parameters.AddWithValue("@Password", client.Password);
 
-        command.Parameters.AddWithValue("@firstname",   client.Firstname);
-        command.Parameters.AddWithValue("@lastname",    client.Lastname);
-
-        command.Parameters.AddWithValue("@address",     client.Address);
-        command.Parameters.AddWithValue("@city",        client.Town);
-        command.Parameters.AddWithValue("@region",      client.Region);
-        command.Parameters.AddWithValue("@postalCode",  client.PostalCode);
-        command.Parameters.AddWithValue("@country",     client.Country);
-
-        if (!DBConnection.Execute(command))
-            return false;
-
-        client.IDClient = DBConnection.GetLastPk("Client");
-        return true;
-    }
-
-    public static bool Delete(int id)
-    {
-        return DBConnection.Delete("Client", id);
+        return DBConnection.ExecuteCommandToDB(command);
     }
 
     public static bool Update(Client client)
     {
-        string sql = $@"UPDATE `Client`
-            SET
-            `email`           = @email,
-            `password`        = @password,
-            `firstname`       = @firstname,
-            `lastname`        = @lastname,
-            `address`         = @address,
-            `city`            = @city,
-            `region`          = @region,
-            `postalCode`      = @postalCode,
-            `country`         = @country
-            WHERE `pkClient`  = {client.IDClient}";
+        string sql = @"UPDATE Client SET 
+                    Firstname = @Firstname, 
+                    Lastname = @Lastname, 
+                    Address = @Address, 
+                    PostalCode = @PostalCode, 
+                    Town = @Town, 
+                    Country = @Country, 
+                    Email = @Email,
+                    Password = @Password
+                    WHERE IDClient = @IDClient";
 
-        MySqlCommand command = new(sql);
+        using MySqlCommand command = new MySqlCommand(sql);
 
-        command.Parameters.AddWithValue("@email",       client.Email);
-        command.Parameters.AddWithValue("@password",    client.Password);
+        command.Parameters.AddWithValue("@Firstname", client.Firstname);
+        command.Parameters.AddWithValue("@Lastname", client.Lastname);
+        command.Parameters.AddWithValue("@Address", client.Address);
+        command.Parameters.AddWithValue("@PostalCode", client.PostalCode);
+        command.Parameters.AddWithValue("@Town", client.Town);
+        command.Parameters.AddWithValue("@Country", client.Country);
+        command.Parameters.AddWithValue("@Email", client.Email);
+        command.Parameters.AddWithValue("@Password", client.Password);
+        command.Parameters.AddWithValue("@IDClient", client.IDClient);
 
-        command.Parameters.AddWithValue("@firstname",   client.Firstname);
-        command.Parameters.AddWithValue("@lastname",    client.Lastname);
+        return DBConnection.ExecuteCommandToDB(command);
+    }
 
-        command.Parameters.AddWithValue("@address",     client.Address);
-        command.Parameters.AddWithValue("@city",        client.Town);
-        command.Parameters.AddWithValue("@region",      client.Region);
-        command.Parameters.AddWithValue("@postalCode",  client.PostalCode);
-        command.Parameters.AddWithValue("@country",     client.Country);
+    public static bool Delete(int id)
+    {
+        string sql = $"DELETE FROM Client WHERE IDClient = {id}";
 
-        if (!DBConnection.Execute(command))
-            return false;
+        using MySqlCommand command = new MySqlCommand(sql);
 
-        return true;
+        return DBConnection.ExecuteCommandToDB(command);
     }
 }

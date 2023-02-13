@@ -2,7 +2,10 @@
 
 public class ClientCommandList
 {
+    public int IDArticle { get; set; }
     public int Quantity { get; set; }
+    public int IDQuantityType { get; set; }
+
     public Article Article { get; set; } = new();
-    public ClientCommand ClientCommand { get; set; } = new();
+    public QuantityType QuantityType { get; set; } = new();
 }

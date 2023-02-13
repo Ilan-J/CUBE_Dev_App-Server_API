@@ -2,7 +2,8 @@
 
 public class SupplierCommandList
 {
+    public int IDArticle { get; set; }
     public int Quantity { get; set; }
+
     public Article Article { get; set; } = new();
-    public SupplierCommand SupplierCommand { get; set; } = new();
 }

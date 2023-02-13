@@ -5,88 +5,95 @@ namespace CUBE_Dev_App_Server_API.Services;
 
 public static class WineFamilyService
 {
-    public static bool GetAll(out List<WineFamily> wineFamilies)
+    public static bool GetAll(out List<WineFamily>? wineFamilies)
     {
-        string sql = "SELECT * FROM `WineFamily`";
+        string sql = @"SELECT * FROM WineFamily ORDER BY idWineFamily";
+
+        using MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
+
+        if (reader == null)
+        {
+            wineFamilies = null;
+            return false;
+        }
 
         wineFamilies = new List<WineFamily>();
 
-        MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
-        if (reader is null)
-            return false;
-
         while (reader.Read())
         {
-            wineFamilies.Add(new WineFamily()
+            wineFamilies.Add(new WineFamily
             {
-                IDWineFamily    = reader.GetInt32("pkWineFamily"),
-                Name            = reader.GetString("name")
+                idWineFamily = reader.GetInt32("idWineFamily"),
+                Name = reader.GetString("Name")
             });
         }
-        reader.Close();
+
         return true;
     }
 
     public static bool Get(int id, out WineFamily? wineFamily)
     {
-        string sql = $"SELECT * FROM `WineFamily` WHERE `pkWineFamily` = {id}";
-        
-        MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
-        if (reader is null)
+        string sql = $"SELECT * FROM WineFamily WHERE idWineFamily = {id}";
+
+        using MySqlDataReader? reader = DBConnection.ExecuteReader(sql);
+
+        if (reader == null)
         {
             wineFamily = null;
             return false;
         }
 
-        if (!reader.Read())
+        wineFamily = new WineFamily();
+
+        if (reader.Read())
+        {
+            wineFamily = new WineFamily
+            {
+                idWineFamily = reader.GetInt32("idWineFamily"),
+                Name = reader.GetString("Name")
+            };
+        }
+        else
         {
             wineFamily = null;
-            return true;
         }
 
-        wineFamily = new WineFamily()
-        {
-            IDWineFamily    = reader.GetInt32("pkWineFamily"),
-            Name            = reader.GetString("name")
-        };
-        reader.Close();
         return true;
     }
 
     public static bool Add(WineFamily wineFamily)
     {
-        string sql = "INSERT INTO `WineFamily` (`name`) " +
-            "VALUES (@name)";
+        string sql = "INSERT INTO WineFamily" +
+            "(Name) " +
+            "VALUES (@Name)";
 
-        MySqlCommand command = new(sql);
+        using MySqlCommand command = new MySqlCommand(sql);
 
-        command.Parameters.AddWithValue("@name", wineFamily.Name);
+        command.Parameters.AddWithValue("@Name", wineFamily.Name);
 
-        if (!DBConnection.Execute(command))
-            return false;
-
-        wineFamily.IDWineFamily = DBConnection.GetLastPk("WineFamily");
-        return true;
-    }
-
-    public static bool Delete(int id)
-    {
-        return DBConnection.Delete("WineFamily", id);
+        return DBConnection.ExecuteCommandToDB(command);
     }
 
     public static bool Update(WineFamily wineFamily)
     {
-        string sql = $"UPDATE `WineFamily` " +
-            $"SET `name` = @name " +
-            $"WHERE `pkWineFamily` = {wineFamily.IDWineFamily}";
+        string sql = @"UPDATE WineFamily SET 
+                    Name = @Name
+                    WHERE idWineFamily = @idWineFamily";
 
-        MySqlCommand command = new(sql);
+        using MySqlCommand command = new MySqlCommand(sql);
 
-        command.Parameters.AddWithValue("@name", wineFamily.Name);
+        command.Parameters.AddWithValue("@idWineFamily", wineFamily.idWineFamily);
+        command.Parameters.AddWithValue("@Name", wineFamily.Name);
 
-        if (!DBConnection.Execute(command))
-            return false;
+        return DBConnection.ExecuteCommandToDB(command);
+    }
 
-        return true;
+    public static bool Delete(int id)
+    {
+        string sql = $"DELETE FROM WineFamily WHERE idWineFamily = {id}";
+
+        using MySqlCommand command = new MySqlCommand(sql);
+
+        return DBConnection.ExecuteCommandToDB(command);
     }
 }
